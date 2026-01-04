@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { check } from '@tauri-apps/plugin-updater';
 import { relaunch } from '@tauri-apps/plugin-process';
 import { Button } from "@/components/ui/button";
-import { ToastAction } from "@/components/ui/toast";
-import { useToast } from "@/hooks/use-toast"; // Assuming hook exists, if not usage might differ
 import { Card } from "@/components/ui/card";
 import { Download, RefreshCcw, X } from "lucide-react";
 

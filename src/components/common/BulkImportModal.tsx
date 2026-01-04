@@ -2,7 +2,6 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Upload, FileUp, AlertTriangle, CheckCircle2 } from "lucide-react"
 
 interface BulkImportModalProps {
@@ -122,20 +121,22 @@ export function BulkImportModal({ isOpen, onClose, onImport, title = "Carga Masi
                                     <div className="bg-muted px-3 py-2 text-xs font-semibold border-b">
                                         Vista Previa ({previewData.length} registros)
                                     </div>
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                {headers.slice(0, 3).map(h => <TableHead key={h} className="h-8">{h}</TableHead>)}
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {previewData.map((row, i) => (
-                                                <TableRow key={i} className="h-8">
-                                                    {headers.slice(0, 3).map(h => <TableCell key={h} className="py-2">{row[h]}</TableCell>)}
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
+                                    <div className="w-full overflow-auto">
+                                        <table className="w-full caption-bottom text-sm">
+                                            <thead className="[&_tr]:border-b">
+                                                <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                                    {headers.slice(0, 3).map(h => <th key={h} className="h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0">{h}</th>)}
+                                                </tr>
+                                            </thead>
+                                            <tbody className="[&_tr:last-child]:border-0">
+                                                {previewData.map((row, i) => (
+                                                    <tr key={i} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                                                        {headers.slice(0, 3).map(h => <td key={h} className="p-4 align-middle [&:has([role=checkbox])]:pr-0">{row[h]}</td>)}
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             )}
                         </div>

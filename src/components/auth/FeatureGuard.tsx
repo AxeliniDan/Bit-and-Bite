@@ -11,9 +11,9 @@ interface FeatureGuardProps {
 }
 
 export function FeatureGuard({ module, children, fallback = null, showLock = false }: FeatureGuardProps) {
-    const { hasModule, loading } = useTenant();
+    const { hasModule, isLoading } = useTenant();
 
-    if (loading) return null; // Or a skeleton
+    if (isLoading) return null; // Or a skeleton
 
     if (hasModule(module)) {
         return <>{children}</>;

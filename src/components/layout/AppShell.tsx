@@ -8,7 +8,7 @@ import { SuspendedLockScreen } from "@/components/common/SuspendedLockScreen";
 import { OnboardingWizard } from "@/features/onboarding/OnboardingWizard";
 import { UpdateNotification } from "@/components/devops/UpdateNotification";
 
-function AppShell() {
+export default function AppShell() {
     const { settings, isSuspended } = useTenant()
 
     // TEMPORARY ROUTE HACKS
