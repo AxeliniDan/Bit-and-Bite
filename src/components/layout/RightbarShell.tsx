@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { CommandPalette } from "@/components/common/CommandPalette"
 import { VoiceMicButton } from "@/features/smart-consult/VoiceMicButton"
 import { useTenant } from "@/context/TenantContext"
-import { User, LogOut, LayoutDashboard, Users, Stethoscope, ShoppingCart, TableProperties, ShieldAlert, Bug } from "lucide-react"
+import { LogOut, LayoutDashboard, Users, Stethoscope, ShoppingCart, TableProperties, ShieldAlert, Bug } from "lucide-react"
 import * as Sentry from "@sentry/react"
 
 function ErrorButton() {

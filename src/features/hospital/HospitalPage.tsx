@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Activity, Pill, FileText, BedDouble, Plus, XCircle, Thermometer, Clock, Stethoscope } from "lucide-react"
+import { Activity, Pill, FileText, Plus, Thermometer, Clock } from "lucide-react"
 
 // Mock Hospital Layout
 const INITIAL_CAGES = [

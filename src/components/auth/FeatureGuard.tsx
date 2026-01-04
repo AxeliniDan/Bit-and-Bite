@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { useTenant } from '@/context/TenantContext';
 import { Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';

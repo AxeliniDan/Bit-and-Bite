@@ -1,6 +1,3 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { createClient } from '@supabase/supabase-js';
-
 // Types
 export interface ClinicSettings {
     modules: string[];
@@ -63,11 +60,6 @@ const DEFAULT_SETTINGS: ClinicSettings = {
 };
 
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
-
-// Supabase Client (Normally imported from lib/supabase)
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export function TenantProvider({ children }: { children: ReactNode }) {
     const [settings, setSettings] = useState<ClinicSettings>(DEFAULT_SETTINGS)
