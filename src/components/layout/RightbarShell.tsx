@@ -31,7 +31,8 @@ export function RightbarShell() {
     const { settings } = useTenant()
 
     const theme = settings.theme || {
-        layout: { navOrder: [] }
+        layout: { navOrder: [] },
+        branding: { logoUrl: null }
     };
 
     // Convert Config to Menu Items
