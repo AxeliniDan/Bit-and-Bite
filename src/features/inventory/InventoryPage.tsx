@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Search, AlertTriangle, PackagePlus, Calendar } from "lucide-react"
+import { Search, AlertTriangle, PackagePlus } from "lucide-react"
 
 // Mock Batches
 const INITIAL_BATCHES = [
@@ -112,8 +112,8 @@ export function InventoryPage() {
                                     <td className="px-6 py-4 font-bold">{row.qty}</td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-1 rounded-full text-xs font-bold ${row.status === 'critical' ? 'bg-red-100 text-red-700' :
-                                                row.status === 'good' ? 'bg-green-100 text-green-700' :
-                                                    'bg-yellow-100 text-yellow-700'
+                                            row.status === 'good' ? 'bg-green-100 text-green-700' :
+                                                'bg-yellow-100 text-yellow-700'
                                             }`}>
                                             {row.status === 'critical' ? 'CRÍTICO' : row.status === 'good' ? 'OPTIMO' : 'BAJO'}
                                         </span>

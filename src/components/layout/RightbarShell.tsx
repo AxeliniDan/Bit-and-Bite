@@ -37,7 +37,7 @@ export function RightbarShell() {
 
     // Convert Config to Menu Items
     const navOrder = theme.layout?.navOrder || [];
-    const menuItems = navOrder.map(module => {
+    const menuItems = navOrder.map((module: string) => {
         switch (module) {
             case 'appointments': return { title: "Agenda_", href: "/", icon: LayoutDashboard }
             case 'patients': return { title: "Pacientes_", href: "/patients", icon: Users }

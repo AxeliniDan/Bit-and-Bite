@@ -26,7 +26,7 @@ export function TopbarShell() {
 
                         {/* Desktop Nav - Centered/Next to logo */}
                         <nav className="hidden md:flex items-center gap-2">
-                            {(settings.theme?.layout?.navOrder || ['appointments', 'patients', 'pos', 'inventory', 'hospital', 'admin']).map(module => {
+                            {(settings.theme?.layout?.navOrder || ['appointments', 'patients', 'pos', 'inventory', 'hospital', 'admin']).map((module: string) => {
                                 const baseClass = "px-3 py-2 text-sm font-medium rounded-full transition-all hover:bg-primary/10 hover:text-primary text-gray-600"
 
                                 if (module === 'appointments') return (

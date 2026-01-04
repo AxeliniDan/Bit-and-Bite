@@ -7,8 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
-import { ArrowLeft, Edit, Printer, Syringe, FileText, Activity, Save, X, Upload, Mic } from "lucide-react"
-import { VoiceMicButton } from "@/features/smart-consult/VoiceMicButton"
+import { ArrowLeft, Edit, Printer, Syringe, Activity, Save, X, Upload, Mic } from "lucide-react"
 
 export function PatientProfile() {
     const { id } = useParams<{ id: string }>()

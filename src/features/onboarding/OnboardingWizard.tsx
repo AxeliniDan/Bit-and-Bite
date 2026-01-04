@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Check, ChevronRight, Stethoscope, Palette, Users } from "lucide-react"
+import { Check, ChevronRight, Stethoscope, Palette } from "lucide-react"
 
 type Step = 'info' | 'theme' | 'finish';
 

@@ -4,13 +4,13 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Ban, CheckCircle, LogIn } from "lucide-react"
-import { useTenant } from "@/context/TenantContext"
-import { useNavigate } from "react-router-dom"
+// import { useTenant } from "@/context/TenantContext"
+// import { useNavigate } from "react-router-dom"
 
 export function TenantList() {
     const [tenants, setTenants] = useState<Tenant[]>([])
-    const { setClinicId } = useTenant() // We need to expose this or manually set LS
-    const navigate = useNavigate()
+    // const { setClinicId } = useTenant() 
+    // const navigate = useNavigate()
 
     useEffect(() => {
         setTenants(getTenants())

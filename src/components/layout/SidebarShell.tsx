@@ -38,7 +38,7 @@ export function SidebarShell() {
 
     // Convert Config to Menu Items (UI Law: Semantic Structure)
     const navOrder = theme.layout?.navOrder || [];
-    const menuItems = navOrder.map(module => {
+    const menuItems = navOrder.map((module: string) => {
         switch (module) {
             case 'appointments': return { title: "Agenda", href: "/", icon: LayoutDashboard }
             case 'patients': return { title: "Pacientes", href: "/patients", icon: Users }
