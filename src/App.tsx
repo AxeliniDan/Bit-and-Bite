@@ -46,7 +46,7 @@ const PageLoader = () => (
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <TenantProvider>
