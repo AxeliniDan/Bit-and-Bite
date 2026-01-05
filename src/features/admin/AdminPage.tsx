@@ -1,14 +1,16 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Shield, Percent } from "lucide-react"
+import { Shield, Percent, Settings, Trash2 } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useDemoData } from "@/hooks/useDemoData"
 
 export function AdminPage() {
     const [showNewRule, setShowNewRule] = useState(false)
+    const { clearData, isClearing } = useDemoData()
 
     const handleExport = () => {
         window.print()
@@ -27,9 +29,10 @@ export function AdminPage() {
             </div>
 
             <Tabs defaultValue="audit" className="w-full">
-                <TabsList className="grid w-full md:w-[400px] grid-cols-2">
+                <TabsList className="grid w-full md:w-[600px] grid-cols-3">
                     <TabsTrigger value="audit">Auditoría (Logs)</TabsTrigger>
                     <TabsTrigger value="commissions">Comisiones</TabsTrigger>
+                    <TabsTrigger value="settings">Ajustes</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="audit" className="mt-4">
@@ -87,6 +90,31 @@ export function AdminPage() {
                         <Button className="mt-4" onClick={() => setShowNewRule(true)}>Nueva Regla</Button>
                     </Card>
                 </TabsContent>
+
+                <TabsContent value="settings" className="mt-4">
+                    <Card className="border-red-200">
+                        <CardHeader className="bg-red-50 text-red-900 rounded-t-xl">
+                            <CardTitle className="text-lg flex items-center gap-2">
+                                <Settings className="h-5 w-5" /> Zona de Peligro
+                            </CardTitle>
+                            <CardDescription className="text-red-700">
+                                Acciones irreversibles que afectan la integridad de los datos.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="p-6">
+                            <div className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm">
+                                <div>
+                                    <h4 className="font-bold text-gray-900">Borrar datos de prueba/demo</h4>
+                                    <p className="text-sm text-gray-500">Elimina todos los pacientes, citas y ventas creados para demostración. Mantiene la configuración de la clínica.</p>
+                                </div>
+                                <Button variant="destructive" onClick={clearData} disabled={isClearing}>
+                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    {isClearing ? 'Borrando...' : 'Borrar Todo'}
+                                </Button>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
             </Tabs>
 
             <Dialog open={showNewRule} onOpenChange={setShowNewRule}>
@@ -116,3 +144,4 @@ export function AdminPage() {
         </div>
     )
 }
+

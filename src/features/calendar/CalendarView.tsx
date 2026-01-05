@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { useAppointments } from './useAppointments'
+import { usePatients } from '@/features/patients/usePatients'
+import { OnboardingHero } from '@/components/onboarding/OnboardingHero'
 // import { NewAppointmentDialog } from './NewAppointmentDialog'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
@@ -22,6 +24,7 @@ export function CalendarView() {
 
     // Fetch Data
     const { data: appointments, isLoading } = useAppointments(currentDate)
+    const { data: patients, isLoading: isLoadingPatients } = usePatients()
 
     const startDate = startOfWeek(currentDate, { weekStartsOn: 1 })
     const weekDays = Array.from({ length: 7 }).map((_, i) => addDays(startDate, i))
@@ -72,9 +75,15 @@ export function CalendarView() {
 
     return (
         <div className="flex flex-col h-full gap-4">
+            {/* ONBOARDING HERO */}
+            {!isLoadingPatients && patients && patients.length === 0 && (
+                <OnboardingHero />
+            )}
+
             <div className="flex items-center justify-between">
-                // Date Navigation
+                {/* Date Navigation */}
                 <div className="flex items-center gap-2">
+
                     <h2 className="text-2xl font-bold capitalize flex items-center gap-2">
                         <CalendarIcon className="h-6 w-6 text-primary" />
                         {format(currentDate, 'MMMM yyyy', { locale: es })}
