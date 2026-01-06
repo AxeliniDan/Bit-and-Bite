@@ -47,7 +47,7 @@ export function SuperAdminPage() {
     // 2. Fetch Clinics
     const fetchClinics = async () => {
         setIsLoading(true)
-        const { data, error } = await supabase
+        const { data } = await supabase
             .from('clinics')
             .select('*')
             .order('created_at', { ascending: false })
@@ -135,7 +135,6 @@ export function SuperAdminPage() {
     }
 
     const availableModules = ['appointments', 'patients', 'pos', 'hospital', 'inventory', 'admin']
-    const navOrder = editSettings?.layout?.navOrder || availableModules
 
     const moveModule = (index: number, direction: 'up' | 'down') => {
         setEditSettings((prev: any) => {
