@@ -67,7 +67,7 @@ const TenantContext = createContext<TenantContextType | undefined>(undefined);
 
 export function TenantProvider({ children }: { children: ReactNode }) {
     const [settings] = useState<ClinicSettings>(DEFAULT_SETTINGS)
-    const [clinicId, setClinicId] = useState<string>("c-demo-001") // Default ID
+    const [clinicId, setClinicId] = useState<string>("") // Empty by default
     const [isSuspended] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
     const [isSuperAdmin, setIsSuperAdmin] = useState(false)

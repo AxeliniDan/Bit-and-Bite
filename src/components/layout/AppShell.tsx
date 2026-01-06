@@ -1,4 +1,5 @@
 import { useTenant } from "@/context/TenantContext"
+import { useAuth } from "@/features/auth/AuthContext"
 import { SidebarShell } from "./SidebarShell"
 import { TopbarShell } from "./TopbarShell"
 import { RightbarShell } from "./RightbarShell"
@@ -10,6 +11,14 @@ import { UpdateNotification } from "@/components/devops/UpdateNotification";
 
 export function AppShell() {
     const { settings, isSuspended } = useTenant()
+    const { user, loading } = useAuth()
+
+    if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>
+
+    if (!user) {
+        window.location.href = '/login'
+        return null
+    }
 
     // TEMPORARY ROUTE HACKS
     if (window.location.pathname === '/super-admin') {
