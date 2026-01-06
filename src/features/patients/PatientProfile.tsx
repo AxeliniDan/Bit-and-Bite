@@ -1,6 +1,7 @@
 import { useState, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { usePatient, useUpdatePatient } from "./usePatients"
+import { VaccineList } from "./VaccineList"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -179,18 +180,11 @@ export function PatientProfile() {
                 </TabsContent>
 
                 <TabsContent value="vaccines" className="mt-6">
-                    <Card>
-                        <CardHeader className="flex flex-row items-center justify-between">
-                            <CardTitle>Cartilla de Vacunación</CardTitle>
-                            <Button size="sm" variant="outline" onClick={() => setShowVaccineModal(true)}>
-                                <Plus className="mr-2 h-4 w-4" /> Registrar Vacuna
-                            </Button>
-                        </CardHeader>
-                        <CardContent>
-                            {/* Existing list would go here */}
-                            <div className="text-sm text-gray-500 italic">Historial de vacunas...</div>
-                        </CardContent>
-                    </Card>
+                    <VaccineList
+                        patientId={patient.id}
+                        patientName={patient.name}
+                        clientPhone={patient.client_phone || ""}
+                    />
                 </TabsContent>
 
                 <TabsContent value="info" className="mt-6">
@@ -252,22 +246,4 @@ export function PatientProfile() {
     )
 }
 
-function Plus(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M5 12h14" />
-            <path d="M12 5v14" />
-        </svg>
-    )
-}
+

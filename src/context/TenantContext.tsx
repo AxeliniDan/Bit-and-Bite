@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { supabase } from "@/lib/supabase"
 
 // Types
 export interface ClinicSettings {
@@ -107,81 +108,56 @@ export function TenantProvider({ children }: { children: ReactNode }) {
         const loadTenant = async () => {
             setIsLoading(true)
             try {
-                // 1. Check Mock "Database" (saas_tenants) for Status
-                const allTenantsStr = localStorage.getItem('saas_tenants');
-                if (allTenantsStr) {
-                    const allTenants = JSON.parse(allTenantsStr);
-                    const currentTenant = allTenants.find((t: any) => t.id === clinicId);
+                // 1. Check current session
+                const { data: { session } } = await supabase.auth.getSession()
 
-                    // Check suspended status
-                    if (currentTenant && currentTenant.status === 'suspended') {
-                        setIsSuspended(true);
-                    } else {
-                        setIsSuspended(false);
-                    }
+                if (!session?.user) {
+                    // No user logged in
+                    setClinicId("")
+                    setIsLoading(false)
+                    return
                 }
 
-                // 2. Load Settings (Simulated by LocalStorage for Demo)
-                // In real app, we would fetch /api/tenants/{clinicId}/settings
-                // Note: Each mock tenant should ideally have its own storage key, e.g. `settings_${clinicId}`
-                // For now, we fallback to the shared demo settings or default if not found.
+                // 2. Fetch User Profile to get Clinic ID
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('clinic_id, role')
+                    .eq('id', session.user.id)
+                    .single()
 
-                // MOCK LOGIC for Dynamic Settings per tenant:
-                // Try to load specifics, else demo, else defaults.
-                const storedSettings = localStorage.getItem(`settings_${clinicId}`) || localStorage.getItem('demo_clinic_settings');
-                let parsedSettings = storedSettings ? JSON.parse(storedSettings) : null;
+                if (profileError) throw profileError
 
-                // RESET / MIGRATION LOGIC
-                if (parsedSettings && !parsedSettings.theme) {
-                    console.log("Migrating legacy settings to Standard Theme");
-                    parsedSettings = DEFAULT_SETTINGS;
-                }
+                if (profile?.clinic_id) {
+                    setClinicId(profile.clinic_id)
 
-                const currentSettings = parsedSettings || DEFAULT_SETTINGS;
-                setSettings(currentSettings);
-
-                // 3. Inject Theme Tokens (Dynamic CSS Variables)
-                if (currentSettings.theme) {
-                    const theme = currentSettings.theme;
-                    const root = document.documentElement;
-
-                    // Inject Palette
-                    if (theme.tokens?.palette) {
-                        try {
-                            const p = theme.tokens.palette;
-                            const setHslProxy = (name: string, hex: string) => {
-                                try {
-                                    root.style.setProperty(`--${name}`, hexToCurrentShadcnFormat(hex));
-                                } catch (e) { /* ignore */ }
-                            };
-
-                            setHslProxy('primary', p.primary);
-                            if (p.background) setHslProxy('background', p.background);
-                            if (p.secondary) setHslProxy('secondary', p.secondary);
-                            if (p.accent) setHslProxy('accent', p.accent);
-                            if (p.surface) {
-                                setHslProxy('card', p.surface);
-                                setHslProxy('popover', p.surface);
-                            }
-                            if (p.success) setHslProxy('destructive', p.error);
-
-                        } catch (e) { console.error("Theme injection failed", e); }
-                    }
-
-                    // Inject Radius
-                    if (theme.tokens?.radius !== undefined) {
-                        root.style.setProperty('--radius', `${theme.tokens.radius}rem`);
-                    }
+                    // 3. Optional: Fetch Clinic Settings or Details if needed
+                    // For now we assume default settings + dynamic theme
+                    // In future: const { data: clinic } = ...
                 }
 
             } catch (error) {
                 console.error("Failed to load tenant", error)
+                // Fallback to demo if auth fails? No, better to force login.
             } finally {
                 setIsLoading(false)
             }
         }
+
+        // Listen for Auth Changes
+        const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+                loadTenant()
+            } else if (event === 'SIGNED_OUT') {
+                setClinicId("")
+            }
+        })
+
         loadTenant()
-    }, [clinicId]) // Re-run when clinicId changes (Super Admin switch)
+
+        return () => {
+            authListener.subscription.unsubscribe()
+        }
+    }, [])
 
     const hasModule = (moduleName: string) => {
         if (isLoading) return true;
