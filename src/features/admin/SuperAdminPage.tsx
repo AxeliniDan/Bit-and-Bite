@@ -1,4 +1,7 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { supabase } from "@/lib/supabase"
+import { useTenant } from "@/context/TenantContext"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
@@ -8,71 +11,120 @@ import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Building2, ShieldAlert, Palette, Plus, UserPlus, Mail, Layout, ArrowUp, ArrowDown, PanelLeft, PanelTop } from "lucide-react"
 
-// Mock Clinics Data
-const MOCK_CLINICS = [
-    {
-        id: "c-demo-001",
-        name: "Vet Demo Clinic",
-        status: "active",
-        settings: {
-            modules: ['pos', 'appointments', 'patients', 'hospital', 'admin'],
-            branding: { primaryColor: '#2563eb' }
-        }
-    },
-    {
-        id: "c-starter-002",
-        name: "Pequeñas Patitas",
-        status: "trial",
-        settings: {
-            modules: ['appointments', 'patients'],
-            branding: { primaryColor: '#16a34a' }
-        }
-    },
-    {
-        id: "c-enterprise-003",
-        name: "Hospital Veterinario Central",
-        status: "active",
-        settings: {
-            modules: ['pos', 'appointments', 'patients', 'hospital', 'admin', 'inventory'],
-            branding: { primaryColor: '#dc2626' }
-        }
-    }
-]
+// Types
+interface Clinic {
+    id: string;
+    name: string;
+    status: 'active' | 'trial' | 'past_due' | 'suspended';
+    settings: any;
+    created_at: string;
+}
 
 export function SuperAdminPage() {
-    // Initialize with stored data if available
-    const [clinics, setClinics] = useState(() => {
-        const stored = localStorage.getItem('demo_clinic_settings')
-        const initial = [...MOCK_CLINICS]
-        if (stored) {
-            // Update the demo clinic with stored settings
-            const parsed = JSON.parse(stored)
-            initial[0].settings = parsed
-        }
-        return initial
-    })
+    const { isSuperAdmin, isLoading: isAuthLoading } = useTenant()
+    const navigate = useNavigate()
 
-    const [selectedClinic, setSelectedClinic] = useState<any>(null)
+    // Data State
+    const [clinics, setClinics] = useState<Clinic[]>([])
+    const [isLoading, setIsLoading] = useState(true)
+
+    // UI State
+    const [selectedClinic, setSelectedClinic] = useState<Clinic | null>(null)
     const [isEditing, setIsEditing] = useState(false)
     const [isCreating, setIsCreating] = useState(false)
 
-    // Edit Form State
+    // Forms
     const [editSettings, setEditSettings] = useState<any>(null)
+    const [newClinicData, setNewClinicData] = useState({ name: '', adminEmail: '', adminName: '' })
 
-    // Create Form State
-    const [newClinicData, setNewClinicData] = useState({ name: '', adminEmail: '' })
+    // 1. Verify Access
+    useEffect(() => {
+        if (!isAuthLoading && !isSuperAdmin) {
+            navigate("/") // Redirect unauthorized
+        }
+    }, [isSuperAdmin, isAuthLoading, navigate])
 
-    const handleEditClick = (clinic: any) => {
+    // 2. Fetch Clinics
+    const fetchClinics = async () => {
+        setIsLoading(true)
+        const { data, error } = await supabase
+            .from('clinics')
+            .select('*')
+            .order('created_at', { ascending: false })
+
+        if (data) setClinics(data as any[])
+        setIsLoading(false)
+    }
+
+    useEffect(() => {
+        if (isSuperAdmin) fetchClinics()
+    }, [isSuperAdmin])
+
+
+    const handleEditClick = (clinic: Clinic) => {
         setSelectedClinic(clinic)
-        setEditSettings(JSON.parse(JSON.stringify(clinic.settings))) // Deep copy
+        // Ensure default settings structure exists
+        const currentSettings = clinic.settings || { modules: [], branding: {}, layout: {} }
+        setEditSettings(JSON.parse(JSON.stringify(currentSettings))) // Deep copy
         setIsEditing(true)
     }
 
+
+    const handleSave = async () => {
+        if (!selectedClinic) return
+
+        const { error } = await supabase
+            .from('clinics')
+            .update({ settings: editSettings })
+            .eq('id', selectedClinic.id)
+
+        if (error) {
+            alert("Error al actualizar: " + error.message)
+        } else {
+            alert("✅ Configuración actualizada")
+            setIsEditing(false)
+            fetchClinics()
+        }
+    }
+
+    const handleCreateClinic = async () => {
+        if (!newClinicData.name || !newClinicData.adminEmail) return alert("Completa los datos")
+
+        // 1. Create Clinic
+        const { data: clinic, error: clinicError } = await supabase
+            .from('clinics')
+            .insert({
+                name: newClinicData.name,
+                search_code: Math.random().toString(36).substring(7),
+                settings: {
+                    modules: ['appointments', 'patients'],
+                    branding: { primaryColor: '#2563eb' }
+                }
+            })
+            .select()
+            .single()
+
+        if (clinicError) return alert("Error creando clínica: " + clinicError.message)
+
+        // 2. Invite/Create Admin User (Mock for now, or use Supabase Admin API if enabled)
+        // Since we are client-side, we can't create users directly without logging them in.
+        // Alternative: Create a "Profile" placeholder and let them claim it? 
+        // OR: Just create the clinic and tell the Super Admin to share the "Login Code" if we implement that.
+        // FOR NOW: We just create the clinic. User creation is manual or handled separately.
+
+        alert(`✅ Clínica creada: ${clinic.name}\n\nNota: Para asignar un admin, el usuario debe registrarse y tú debes vincularlo manualmente o usar el sistema de invitación (pendiente).`)
+
+        setClinics([clinic as any, ...clinics])
+        setIsCreating(false)
+        setNewClinicData({ name: '', adminEmail: '', adminName: '' })
+    }
+
+    // Toggle Module Helper
     const toggleModule = (module: string) => {
         setEditSettings((prev: any) => {
-            const modules = prev.modules.includes(module)
+            const modules = prev.modules?.includes(module)
                 ? prev.modules.filter((m: string) => m !== module)
-                : [...prev.modules, module]
+                : [...(prev.modules || []), module]
             return { ...prev, modules }
         })
     }
@@ -81,6 +133,9 @@ export function SuperAdminPage() {
     const changeRadius = (val: number) => {
         setEditSettings((prev: any) => ({ ...prev, layout: { ...prev.layout, radius: val } }))
     }
+
+    const availableModules = ['appointments', 'patients', 'pos', 'hospital', 'inventory', 'admin']
+    const navOrder = editSettings?.layout?.navOrder || availableModules
 
     const moveModule = (index: number, direction: 'up' | 'down') => {
         setEditSettings((prev: any) => {
@@ -95,46 +150,8 @@ export function SuperAdminPage() {
         })
     }
 
-    const handleSave = () => {
-        // In real app: await supabase.from('clinics').update({ settings: editSettings }).eq('id', selectedClinic.id)
-        setClinics(prev => prev.map(c => c.id === selectedClinic.id ? { ...c, settings: editSettings } : c))
-
-        // PERSIST TO LOCALSTORAGE for Demo Mode
-        if (selectedClinic.id === "c-demo-001") {
-            localStorage.setItem('demo_clinic_settings', JSON.stringify(editSettings))
-        }
-
-        setIsEditing(false)
-        alert(`✅ Configuración actualizada para ${selectedClinic.name}`)
-
-        if (selectedClinic.id === "c-demo-001") {
-            if (confirm("Has modificado la clínica actual. ¿Recargar para ver cambios?")) {
-                window.location.href = "/"
-            }
-        }
-    }
-
-    const handleCreateClinic = () => {
-        if (!newClinicData.name || !newClinicData.adminEmail) return alert("Completa los datos")
-
-        const newId = `c-${Date.now()}`
-        const newClinic = {
-            id: newId,
-            name: newClinicData.name,
-            status: "trial",
-            settings: {
-                modules: ['appointments', 'patients'],
-                branding: { primaryColor: '#000000' }
-            }
-        }
-
-        setClinics([...clinics, newClinic])
-        setIsCreating(false)
-        setNewClinicData({ name: '', adminEmail: '' })
-        alert(`✅ Clínica creada: ${newClinic.name}\n\n📩 Se ha enviado invitación a: ${newClinicData.adminEmail}\n(Simulación)`)
-    }
-
-    const availableModules = ['appointments', 'patients', 'pos', 'hospital', 'inventory', 'admin']
+    if (isAuthLoading) return <div className="p-8">Verificando permisos...</div>
+    if (!isSuperAdmin) return <div className="p-8 text-red-600">Acceso Denegado.</div>
 
     return (
         <div className="p-8 max-w-7xl mx-auto space-y-8">
@@ -152,7 +169,7 @@ export function SuperAdminPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-6">
-                {clinics.map(clinic => (
+                {isLoading ? <p>Cargando clínicas...</p> : clinics.map(clinic => (
                     <Card key={clinic.id} className="p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 hover:shadow-md transition-shadow">
                         <div className="flex items-start gap-4">
                             <div className="h-12 w-12 bg-slate-100 rounded-full flex items-center justify-center">
@@ -162,12 +179,12 @@ export function SuperAdminPage() {
                                 <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                                     {clinic.name}
                                     <Badge variant={clinic.status === 'active' ? 'default' : 'secondary'} className={clinic.status === 'active' ? 'bg-green-600' : ''}>
-                                        {clinic.status}
+                                        {clinic.status || 'Active'}
                                     </Badge>
                                 </h3>
                                 <div className="text-sm text-muted-foreground font-mono mt-1">ID: {clinic.id}</div>
                                 <div className="flex gap-2 mt-2 flex-wrap">
-                                    {clinic.settings.modules.map((m: string) => (
+                                    {clinic.settings?.modules?.map((m: string) => (
                                         <span key={m} className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full border border-blue-100 font-medium">
                                             {m}
                                         </span>
@@ -179,7 +196,7 @@ export function SuperAdminPage() {
                         <div className="flex items-center gap-4">
                             <div
                                 className="h-8 w-8 rounded-full border shadow-sm"
-                                style={{ backgroundColor: clinic.settings.branding?.primaryColor || '#000' }}
+                                style={{ backgroundColor: clinic.settings?.branding?.primaryColor || '#000' }}
                                 title="Color Primario de Marca"
                             />
                             <Button variant="outline" onClick={() => handleEditClick(clinic)}>Configurar</Button>

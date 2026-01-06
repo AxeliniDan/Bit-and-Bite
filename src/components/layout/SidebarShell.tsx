@@ -28,7 +28,7 @@ function ErrorButton() {
 
 export function SidebarShell() {
     const { signOut, profile } = useAuth()
-    const { settings } = useTenant()
+    const { settings, isSuperAdmin } = useTenant()
 
     const theme = settings.theme || {
         layout: { navOrder: [] },
@@ -64,6 +64,20 @@ export function SidebarShell() {
 
                 <div className="flex-1 py-6 px-4 overflow-y-auto">
                     <SidebarNav items={menuItems} />
+
+                    {isSuperAdmin && (
+                        <div className="mt-8 pt-4 border-t border-dashed border-border">
+                            <div className="px-2 mb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                                Sistema
+                            </div>
+                            <Button variant="ghost" className="w-full justify-start text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50" asChild>
+                                <a href="/super-admin">
+                                    <ShieldAlert className="mr-2 h-4 w-4" />
+                                    Super Admin
+                                </a>
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="p-4 border-t border-border bg-card">

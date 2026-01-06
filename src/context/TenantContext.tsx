@@ -35,6 +35,7 @@ export interface TenantContextType {
     setClinicId: (id: string) => void;
     isSuspended: boolean;
     hasModule: (moduleName: string) => boolean;
+    isSuperAdmin: boolean;
 }
 
 // Default Settings
@@ -69,6 +70,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
     const [clinicId, setClinicId] = useState<string>("c-demo-001") // Default ID
     const [isSuspended] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
+    const [isSuperAdmin, setIsSuperAdmin] = useState(false)
 
     useEffect(() => {
         const loadTenant = async () => {
@@ -80,6 +82,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
                 if (!session?.user) {
                     // No user logged in
                     setClinicId("")
+                    setIsSuperAdmin(false)
                     setIsLoading(false)
                     return
                 }
@@ -87,18 +90,15 @@ export function TenantProvider({ children }: { children: ReactNode }) {
                 // 2. Fetch User Profile to get Clinic ID
                 const { data: profile, error: profileError } = await supabase
                     .from('profiles')
-                    .select('clinic_id, role')
+                    .select('clinic_id, role, is_super_admin')
                     .eq('id', session.user.id)
                     .single()
 
                 if (profileError) throw profileError
 
-                if (profile?.clinic_id) {
-                    setClinicId(profile.clinic_id)
-
-                    // 3. Optional: Fetch Clinic Settings or Details if needed
-                    // For now we assume default settings + dynamic theme
-                    // In future: const { data: clinic } = ...
+                if (profile) {
+                    if (profile.clinic_id) setClinicId(profile.clinic_id)
+                    if (profile.is_super_admin) setIsSuperAdmin(true)
                 }
 
             } catch (error) {
@@ -115,6 +115,7 @@ export function TenantProvider({ children }: { children: ReactNode }) {
                 loadTenant()
             } else if (event === 'SIGNED_OUT') {
                 setClinicId("")
+                setIsSuperAdmin(false)
             }
         })
 
@@ -137,7 +138,8 @@ export function TenantProvider({ children }: { children: ReactNode }) {
             isLoading,
             setClinicId,
             isSuspended,
-            hasModule
+            hasModule,
+            isSuperAdmin
         }}>
             {children}
         </TenantContext.Provider>
