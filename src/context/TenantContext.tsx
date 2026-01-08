@@ -103,8 +103,11 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
             } catch (error) {
                 console.error("Failed to load tenant", error)
-                // Fallback to demo if auth fails? No, better to force login.
             } finally {
+                // DEMO MODE CHECK
+                if (window.location.hostname.includes("axelinidan.github.io") || window.location.hash.includes("demo_mode=true")) {
+                    if (!clinicId) setClinicId("demo-clinic")
+                }
                 setIsLoading(false)
             }
         }

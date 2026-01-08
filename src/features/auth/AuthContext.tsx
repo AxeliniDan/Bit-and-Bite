@@ -29,6 +29,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (session?.user) {
                 fetchProfile(session.user.id)
             } else {
+                // DEMO MODE CHECK
+                if (window.location.hostname.includes("axelinidan.github.io") || window.location.hash.includes("demo_mode=true")) {
+                    console.log("⚠️ DEMO MODE ACTIVATED (Initial)")
+                    const demoUser = { id: "demo-user", email: "demo@bitandbite.com", app_metadata: {}, user_metadata: {}, aud: "authenticated", created_at: new Date().toISOString() } as User
+                    setUser(demoUser)
+                    setSession({ user: demoUser, access_token: "demo", refresh_token: "demo", expires_in: 3600, token_type: "bearer" } as Session)
+                    // Mock Profile
+                    setProfile({ id: "demo-user", first_name: "Demo", last_name: "User", clinic_id: "demo-clinic", role: "admin", is_super_admin: false, created_at: new Date().toISOString() } as any)
+                }
                 setLoading(false)
             }
         })
@@ -40,7 +49,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             if (session?.user) {
                 fetchProfile(session.user.id)
             } else {
-                setProfile(null)
+                // DEMO MODE CHECK
+                if (window.location.hostname.includes("axelinidan.github.io") || window.location.hash.includes("demo_mode=true")) {
+                    console.log("⚠️ DEMO MODE ACTIVATED")
+                    const demoUser = { id: "demo-user", email: "demo@bitandbite.com", app_metadata: {}, user_metadata: {}, aud: "authenticated", created_at: new Date().toISOString() } as User
+                    setUser(demoUser)
+                    setSession({ user: demoUser, access_token: "demo", refresh_token: "demo", expires_in: 3600, token_type: "bearer" } as Session)
+                    // Mock Profile
+                    setProfile({ id: "demo-user", first_name: "Demo", last_name: "User", clinic_id: "demo-clinic", role: "admin", is_super_admin: false, created_at: new Date().toISOString() } as any)
+                } else {
+                    setProfile(null)
+                }
                 setLoading(false)
             }
         })
