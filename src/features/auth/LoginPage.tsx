@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
 import { Mail, Lock } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -85,6 +85,9 @@ export function LoginPage() {
                     </form>
 
                     <div className="mt-6 text-center text-xs text-gray-500">
+                        <Link to="/about" className="text-primary hover:underline mb-2 block text-sm font-medium">
+                            Conoce más sobre nosotros (Bit and Bite)
+                        </Link>
                         <p>¿No tienes cuenta? Contacta al administrador.</p>
                         <p className="mt-1">Acceso restringido a personal autorizado.</p>
                     </div>
