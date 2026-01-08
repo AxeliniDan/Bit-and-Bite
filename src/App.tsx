@@ -1,6 +1,6 @@
 import { Suspense, lazy } from "react"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { BrowserRouter, Route, Routes } from "react-router-dom"
+import { HashRouter, Route, Routes } from "react-router-dom"
 import { AuthProvider } from "@/features/auth/AuthContext"
 import { TenantProvider } from "@/context/TenantContext"
 import { AppShell } from "@/components/layout/AppShell"
@@ -47,7 +47,7 @@ const PageLoader = () => (
 
 function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
+    <HashRouter>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <TenantProvider>
@@ -79,7 +79,7 @@ function App() {
           </TenantProvider>
         </AuthProvider>
       </QueryClientProvider>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 
