@@ -63,7 +63,7 @@ export function VoiceMicButton() {
                 <Button
                     size="icon"
                     className={`h-14 w-14 rounded-full shadow-2xl transition-all duration-300 ${isRecording ? 'bg-red-500 hover:bg-red-600 scale-110' : 'bg-indigo-600 hover:bg-indigo-700'}`}
-                    onClick={isRecording ? handleStop : startRecording}
+                    onClick={isRecording ? handleStop : () => startRecording()}
                 >
                     {isRecording ? (
                         <Square className="h-6 w-6 fill-current" />

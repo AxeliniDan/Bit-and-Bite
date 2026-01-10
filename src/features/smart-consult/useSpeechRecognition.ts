@@ -5,6 +5,8 @@ export function useSpeechRecognition() {
     const [transcript, setTranscript] = useState("")
     const [error, setError] = useState<string | null>(null)
 
+    const [interimTranscript, setInterimTranscript] = useState("")
+
     // Use useRef to persist the recognition instance
     const recognitionRef = useRef<any>(null)
 
@@ -15,18 +17,24 @@ export function useSpeechRecognition() {
             const recognition = new SpeechRecognition()
             recognition.continuous = true
             recognition.interimResults = true
-            recognition.lang = 'es-ES' // Set to Spanish
+            recognition.lang = 'es-ES' // Default
 
             recognition.onresult = (event: any) => {
                 let finalTranscript = ''
+                let currentInterim = ''
+
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     if (event.results[i].isFinal) {
                         finalTranscript += event.results[i][0].transcript
+                    } else {
+                        currentInterim += event.results[i][0].transcript
                     }
                 }
+
                 if (finalTranscript) {
                     setTranscript(prev => prev + " " + finalTranscript)
                 }
+                setInterimTranscript(currentInterim)
             }
 
             recognition.onerror = (event: any) => {
@@ -41,10 +49,12 @@ export function useSpeechRecognition() {
         }
     }, [])
 
-    const startRecording = useCallback(() => {
+    const startRecording = useCallback((lang: string = 'es-ES') => {
         setTranscript("")
+        setInterimTranscript("")
         setError(null)
         if (recognitionRef.current) {
+            recognitionRef.current.lang = lang
             recognitionRef.current.start()
             setIsRecording(true)
         }
@@ -54,18 +64,23 @@ export function useSpeechRecognition() {
         if (recognitionRef.current) {
             recognitionRef.current.stop()
             setIsRecording(false)
+            setInterimTranscript("") // Clear interim on stop
         }
     }, [])
 
-    // Also support Blob recording for fallback if needed, but for now we focus on Text
-    // We mock the Blob interface to keep compatibility with existing button logic slightly
-    // but better to expose the text directly.
+    const resetTranscript = useCallback(() => {
+        setTranscript("")
+        setInterimTranscript("")
+        setError(null)
+    }, [])
 
     return {
         isRecording,
         transcript,
+        interimTranscript,
         error,
         startRecording,
-        stopRecording
+        stopRecording,
+        resetTranscript
     }
 }

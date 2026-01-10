@@ -1,3 +1,4 @@
+import { Navigate } from "react-router-dom"
 import { useTenant } from "@/context/TenantContext"
 import { useAuth } from "@/features/auth/AuthContext"
 import { SidebarShell } from "./SidebarShell"
@@ -16,8 +17,7 @@ export function AppShell() {
     if (loading) return <div className="min-h-screen flex items-center justify-center">Cargando...</div>
 
     if (!user) {
-        window.location.href = '/login'
-        return null
+        return <Navigate to="/login" />
     }
 
     // TEMPORARY ROUTE HACKS

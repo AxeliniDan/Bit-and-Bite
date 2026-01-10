@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from "@/lib/supabase"
+import { useAuth } from "@/features/auth/AuthContext"
 
 // Types
 export interface ClinicSettings {
@@ -40,7 +41,7 @@ export interface TenantContextType {
 
 // Default Settings
 const DEFAULT_SETTINGS: ClinicSettings = {
-    modules: ['appointments', 'patients', 'pos', 'hospital', 'inventory', 'admin'],
+    modules: ['appointments', 'patients', 'pos', 'hospital', 'inventory', 'translator', 'admin'],
     theme: {
         tokens: {
             palette: {
@@ -57,7 +58,7 @@ const DEFAULT_SETTINGS: ClinicSettings = {
         layout: {
             mode: 'sidebar', // Standard Sidebar
             density: 'normal',
-            navOrder: ['appointments', 'patients', 'hospital', 'pos', 'admin', 'inventory']
+            navOrder: ['appointments', 'patients', 'hospital', 'pos', 'translator', 'inventory', 'admin']
         },
         branding: { logoUrl: null }
     }
@@ -66,6 +67,7 @@ const DEFAULT_SETTINGS: ClinicSettings = {
 const TenantContext = createContext<TenantContextType | undefined>(undefined);
 
 export function TenantProvider({ children }: { children: ReactNode }) {
+    const { user, loading: authLoading } = useAuth()
     const [settings] = useState<ClinicSettings>(DEFAULT_SETTINGS)
     const [clinicId, setClinicId] = useState<string>("") // Empty by default
     const [isSuspended] = useState(false)
@@ -74,24 +76,23 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         const loadTenant = async () => {
+            if (authLoading) return // Wait for Auth to finish
+
+            if (!user) {
+                // No user logged in
+                setClinicId("")
+                setIsSuperAdmin(false)
+                setIsLoading(false)
+                return
+            }
+
             setIsLoading(true)
             try {
-                // 1. Check current session
-                const { data: { session } } = await supabase.auth.getSession()
-
-                if (!session?.user) {
-                    // No user logged in
-                    setClinicId("")
-                    setIsSuperAdmin(false)
-                    setIsLoading(false)
-                    return
-                }
-
-                // 2. Fetch User Profile to get Clinic ID
+                // Fetch User Profile to get Clinic ID
                 const { data: profile, error: profileError } = await supabase
                     .from('profiles')
                     .select('clinic_id, role, is_super_admin')
-                    .eq('id', session.user.id)
+                    .eq('id', user.id)
                     .single()
 
                 if (profileError) throw profileError
@@ -112,22 +113,8 @@ export function TenantProvider({ children }: { children: ReactNode }) {
             }
         }
 
-        // Listen for Auth Changes
-        const { data: authListener } = supabase.auth.onAuthStateChange((event, _session) => {
-            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-                loadTenant()
-            } else if (event === 'SIGNED_OUT') {
-                setClinicId("")
-                setIsSuperAdmin(false)
-            }
-        })
-
         loadTenant()
-
-        return () => {
-            authListener.subscription.unsubscribe()
-        }
-    }, [])
+    }, [user, authLoading])
 
     const hasModule = (moduleName: string) => {
         if (isLoading) return true;

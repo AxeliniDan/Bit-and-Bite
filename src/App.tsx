@@ -34,6 +34,7 @@ const HospitalPage = lazy(() => import("@/features/ModulesPages").then(module =>
 const AdminPage = lazy(() => import("@/features/ModulesPages").then(module => ({ default: module.AdminPage })))
 const SuperAdminPage = lazy(() => import("@/features/admin/SuperAdminPage").then(module => ({ default: module.SuperAdminPage })))
 const AboutPage = lazy(() => import("@/features/landing/AboutPage").then(module => ({ default: module.AboutPage })))
+const TranslatorPage = lazy(() => import("@/features/translator/TranslatorPage").then(module => ({ default: module.TranslatorPage })))
 
 // Loading Fallback Component
 const PageLoader = () => (
@@ -66,6 +67,7 @@ function App() {
                   <Route path="/inventory" element={<InventoryPage />} />
                   <Route path="/hospital" element={<HospitalPage />} />
                   <Route path="/admin" element={<AdminPage />} />
+                  <Route path="/translator" element={<TranslatorPage />} />
 
                   {/* Future routes: /schedule, /pos */}
                 </Route>

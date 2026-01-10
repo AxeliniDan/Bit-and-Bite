@@ -1,11 +1,13 @@
 import * as React from "react"
-import { Calendar, CreditCard, Settings, Smile, User } from "lucide-react"
+import { Calendar, CreditCard, Settings, Smile, User, Languages } from "lucide-react"
 import { Command } from "cmdk"
+import { useNavigate } from "react-router-dom"
 // We'll define a dialog wrapper since Shadcn's cmdk implementation usually wraps it in a Dialog
 // For now, I'll create a clean implementation styled directly.
 
 export function CommandPalette() {
     const [open, setOpen] = React.useState(false)
+    const navigate = useNavigate()
 
     React.useEffect(() => {
         const down = (e: KeyboardEvent) => {
@@ -35,15 +37,19 @@ export function CommandPalette() {
                     <Command.List className="max-h-[300px] overflow-y-auto overflow-x-hidden p-2">
                         <Command.Empty className="py-6 text-center text-sm">No se encontraron resultados.</Command.Empty>
                         <Command.Group heading="Sugerencias" className="text-xs font-bold text-muted-foreground px-2 py-1.5">
-                            <Command.Item className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                            <Command.Item onSelect={() => { setOpen(false); navigate("/") }} className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
                                 <Calendar className="mr-2 h-4 w-4" />
                                 <span>Agenda Principal</span>
                             </Command.Item>
-                            <Command.Item className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                            <Command.Item onSelect={() => { setOpen(false); navigate("/translator") }} className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                                <Languages className="mr-2 h-4 w-4" />
+                                <span>Traductor Veterinario</span>
+                            </Command.Item>
+                            <Command.Item onSelect={() => { setOpen(false); navigate("/patients") }} className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
                                 <User className="mr-2 h-4 w-4" />
                                 <span>Buscar Paciente</span>
                             </Command.Item>
-                            <Command.Item className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
+                            <Command.Item onSelect={() => { setOpen(false); navigate("/pos") }} className="relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50">
                                 <CreditCard className="mr-2 h-4 w-4" />
                                 <span>Nueva Venta</span>
                             </Command.Item>
