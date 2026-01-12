@@ -30,7 +30,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 fetchProfile(session.user.id)
             } else {
                 // DEMO MODE CHECK
-                if (window.location.hostname.includes("axelinidan.github.io") || window.location.hash.includes("demo_mode=true")) {
+                // Only activate demo mode if explicitly flag is present in URL
+                // This prevents forcing demo mode on GH Pages when a real user wants to login
+                if (window.location.hash.includes("demo_mode=true")) {
                     console.log("⚠️ DEMO MODE ACTIVATED (Initial)")
                     const demoUser = { id: "demo-user", email: "demo@bitandbite.com", app_metadata: {}, user_metadata: {}, aud: "authenticated", created_at: new Date().toISOString() } as User
                     setUser(demoUser)
@@ -50,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 fetchProfile(session.user.id)
             } else {
                 // DEMO MODE CHECK
-                if (window.location.hostname.includes("axelinidan.github.io") || window.location.hash.includes("demo_mode=true")) {
+                if (window.location.hash.includes("demo_mode=true")) {
                     console.log("⚠️ DEMO MODE ACTIVATED")
                     const demoUser = { id: "demo-user", email: "demo@bitandbite.com", app_metadata: {}, user_metadata: {}, aud: "authenticated", created_at: new Date().toISOString() } as User
                     setUser(demoUser)
@@ -92,6 +94,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfile(null)
         setUser(null)
         setSession(null)
+
+        // Clear demo mode flag from URL if present
+        if (window.location.hash.includes("demo_mode=true")) {
+            window.location.hash = window.location.hash.replace(/[?&]demo_mode=true/, '')
+                .replace(/#\/\?/, '#/');
+        }
     }
 
     return (

@@ -26,7 +26,7 @@ export function TopbarShell() {
 
                         {/* Desktop Nav - Centered/Next to logo */}
                         <nav className="hidden md:flex items-center gap-2">
-                            {(settings.theme?.layout?.navOrder || ['appointments', 'patients', 'pos', 'inventory', 'hospital', 'admin']).map((module: string) => {
+                            {(settings.theme?.layout?.navOrder || ['appointments', 'patients', 'pos', 'inventory', 'hospital', 'translator', 'admin']).map((module: string) => {
                                 const baseClass = "px-3 py-2 text-sm font-medium rounded-full transition-all hover:bg-primary/10 hover:text-primary text-gray-600"
 
                                 if (module === 'appointments') return (
@@ -38,7 +38,8 @@ export function TopbarShell() {
                                 return (
                                     <FeatureGuard key={module} module={module}>
                                         <Link to={`/${module === 'admin' ? 'admin' : module}`} className={`${baseClass} capitalize`}>
-                                            {module === 'pos' ? 'Punto de Venta' : module}
+                                            {module === 'pos' ? 'Punto de Venta' :
+                                                module === 'translator' ? 'Traductor' : module}
                                         </Link>
                                     </FeatureGuard>
                                 )
