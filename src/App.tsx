@@ -1,23 +1,3 @@
-import { Suspense, lazy } from "react"
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
-import { HashRouter, Route, Routes } from "react-router-dom"
-import { AuthProvider } from "@/features/auth/AuthContext"
-import { TenantProvider } from "@/context/TenantContext"
-import { AppShell } from "@/components/layout/AppShell"
-import { Loader2 } from "lucide-react"
-
-// Optimized Query Client
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000, // 1 minute (Data stays "fresh" for 1min)
-      gcTime: 10 * 60 * 1000, // 10 minutes (Keep unused data in cache)
-      refetchOnWindowFocus: false, // Don't refetch just because user clicked window
-      retry: 1
-    }
-  }
-})
-
 // Eager Loading (Critical Path)
 import { LoginPage } from "@/features/auth/LoginPage"
 import { CalendarView } from "@/features/calendar/CalendarView"
