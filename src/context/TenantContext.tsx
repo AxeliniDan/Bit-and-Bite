@@ -68,7 +68,7 @@ const TenantContext = createContext<TenantContextType | undefined>(undefined);
 
 export function TenantProvider({ children }: { children: ReactNode }) {
     const { user, loading: authLoading } = useAuth()
-    const [settings] = useState<ClinicSettings>(DEFAULT_SETTINGS)
+    const [settings, setSettings] = useState<ClinicSettings>(DEFAULT_SETTINGS)
     const [clinicId, setClinicId] = useState<string>("") // Empty by default
     const [isSuspended] = useState(false)
     const [isLoading, setIsLoading] = useState(true)
@@ -88,10 +88,17 @@ export function TenantProvider({ children }: { children: ReactNode }) {
 
             setIsLoading(true)
             try {
-                // Fetch User Profile to get Clinic ID
+                // Fetch User Profile AND Clinic Settings
                 const { data: profile, error: profileError } = await supabase
                     .from('profiles')
-                    .select('clinic_id, role, is_super_admin')
+                    .select(`
+                        clinic_id, 
+                        role, 
+                        is_super_admin,
+                        clinics (
+                            settings
+                        )
+                    `)
                     .eq('id', user.id)
                     .single()
 
@@ -100,6 +107,13 @@ export function TenantProvider({ children }: { children: ReactNode }) {
                 if (profile) {
                     if (profile.clinic_id) setClinicId(profile.clinic_id)
                     if (profile.is_super_admin) setIsSuperAdmin(true)
+
+                    // LOAD SETTINGS FROM DB
+                    // @ts-ignore
+                    if (profile.clinics?.settings) {
+                        // @ts-ignore
+                        setSettings(profile.clinics.settings as ClinicSettings)
+                    }
                 }
 
             } catch (error) {
@@ -107,7 +121,22 @@ export function TenantProvider({ children }: { children: ReactNode }) {
             } finally {
                 // DEMO MODE CHECK
                 if (window.location.hostname.includes("axelinidan.github.io") || window.location.hash.includes("demo_mode=true")) {
-                    if (!clinicId) setClinicId("demo-clinic")
+                    if (!clinicId) {
+                        setClinicId("demo-clinic")
+                        // Enforce Demo Settings with Translator
+                        setSettings({
+                            modules: ['appointments', 'patients', 'pos', 'hospital', 'inventory', 'translator', 'admin'],
+                            theme: {
+                                tokens: DEFAULT_SETTINGS.theme!.tokens,
+                                layout: {
+                                    mode: 'sidebar',
+                                    density: 'normal',
+                                    navOrder: ['appointments', 'patients', 'hospital', 'pos', 'translator', 'inventory', 'admin']
+                                },
+                                branding: { logoUrl: null }
+                            }
+                        })
+                    }
                 }
                 setIsLoading(false)
             }
