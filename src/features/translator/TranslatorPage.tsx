@@ -1,3 +1,5 @@
+// Fix 'any' type error in translateText function in TranslatorPage.tsx
+// Fix 'any' type errors in TranslatorPage.tsx
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -48,9 +50,10 @@ async function translateText(text: string, targetLang: 'es' | 'en'): Promise<str
 
         const data = await response.json()
         return data.candidates?.[0]?.content?.parts?.[0]?.text || "Error: No translation found."
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Translation Request Failed:", error)
-        return `Error: ${error.message || "Unknown error"}`
+        const msg = error instanceof Error ? error.message : "Unknown error"
+        return `Error: ${msg}`
     }
 }
 
@@ -73,9 +76,10 @@ export function TranslatorPage() {
 
             // Auto-speak result
             speak(result, targetLang)
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error(e)
-            alert(e.message || "Translation Error")
+            const msg = e instanceof Error ? e.message : "Translation Error"
+            alert(msg)
         } finally {
             setIsTranslating(false)
         }
