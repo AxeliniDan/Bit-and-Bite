@@ -1,5 +1,5 @@
 import { useAuth } from "@/features/auth/AuthContext"
-import { Outlet } from "react-router-dom"
+import { Outlet, Link } from "react-router-dom"
 import { SidebarNav } from "./SidebarNav"
 import { Button } from "@/components/ui/button"
 import { CommandPalette } from "@/components/common/CommandPalette"
@@ -83,9 +83,9 @@ export function RightbarShell() {
                     {/* SENTRY TEST BUTTON */}
                     <ErrorButton />
 
-                    <a href="/legal/privacy" className="text-[10px] text-muted-foreground hover:text-primary block text-right mb-2 transition-colors">
+                    <Link to="/legal/privacy" className="text-[10px] text-muted-foreground hover:text-primary block text-right mb-2 transition-colors">
                         Política de Privacidad
-                    </a>
+                    </Link>
 
                     <Button variant="destructive" size="sm" onClick={signOut} className="w-full font-bold tracking-wider rounded-none">
                         <LogOut className="mr-2 h-4 w-4" />

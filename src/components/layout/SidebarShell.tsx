@@ -1,5 +1,5 @@
 import { useAuth } from "@/features/auth/AuthContext"
-import { Outlet } from "react-router-dom"
+import { Outlet, Link } from "react-router-dom"
 import { SidebarNav } from "./SidebarNav"
 import { Button } from "@/components/ui/button"
 import { CommandPalette } from "@/components/common/CommandPalette"
@@ -72,10 +72,10 @@ export function SidebarShell() {
                                 Sistema
                             </div>
                             <Button variant="ghost" className="w-full justify-start text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50" asChild>
-                                <a href="/super-admin">
+                                <Link to="/super-admin">
                                     <ShieldAlert className="mr-2 h-4 w-4" />
                                     Super Admin
-                                </a>
+                                </Link>
                             </Button>
                         </div>
                     )}

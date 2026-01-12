@@ -44,7 +44,7 @@ export function SuspendedLockScreen() {
                         onClick={() => {
                             const code = prompt("Código de Super Admin:");
                             if (code === "godmode") {
-                                window.location.href = "/super-admin";
+                                window.location.hash = "#/super-admin";
                             }
                         }}
                     >

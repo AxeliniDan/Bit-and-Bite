@@ -21,7 +21,8 @@ export function TenantList() {
         if (confirm(`¿Entrar al panel de ${tenantId}?`)) {
             console.log("Switching to", tenantId);
             localStorage.setItem('demo_clinic_id', tenantId);
-            window.location.href = "/"; // Hard Reload to trigger Context
+            window.location.hash = "#/"; // Update hash to trigger HashRouter
+            window.location.reload(); // Force reload to ensure context updates with new clinicId
         }
     }
 

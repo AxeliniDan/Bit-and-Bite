@@ -19,7 +19,7 @@ export function OnboardingWizard() {
     const handleNext = () => {
         if (step === 'info') setStep('theme');
         else if (step === 'theme') setStep('finish');
-        else window.location.href = '/'; // Finish
+        else window.location.hash = '#/'; // Finish
     };
 
     return (
