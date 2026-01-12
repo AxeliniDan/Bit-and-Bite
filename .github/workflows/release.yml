@@ -29,12 +29,12 @@ jobs:
       - name: Install dependencies (frontend)
         run: npm ci
 
-      - name: Build frontend
-        run: npm run build
-
       - name: Build Tauri App
         uses: tauri-apps/tauri-action@v2
         env:
+          VITE_GEMINI_API_KEY: ${{ secrets.GEMINI_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}

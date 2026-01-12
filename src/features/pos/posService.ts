@@ -1,12 +1,12 @@
 import { supabase } from "@/lib/supabase"
-import { CartState, PaymentMethods } from "./types"
+import { CartState, PaymentMethods, SaleItem } from "./types"
 
 export const posService = {
     /**
      * Pre-calculates totals without saving to DB.
      * Handles tax logic and currency conversion if needed.
      */
-    calculateCart: (items: any[]): CartState['summary'] => {
+    calculateCart: (items: SaleItem[]): CartState['summary'] => {
         let subtotal = 0
         let taxes = 0
 

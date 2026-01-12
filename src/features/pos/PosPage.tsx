@@ -7,8 +7,19 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Label } from "@/components/ui/label"
 import { useNavigate } from "react-router-dom"
 
+interface Product {
+    id: string
+    name: string
+    price: number
+    sku: string
+}
+
+interface CartItem extends Product {
+    qty: number
+}
+
 // Mock Data
-const MOCK_PRODUCTS = [
+const MOCK_PRODUCTS: Product[] = [
     { id: "1", name: "Vacuna Rabia", price: 350.00, sku: "VAC-001" },
     { id: "2", name: "Consulta General", price: 500.00, sku: "SRV-001" },
     { id: "3", name: "Croquetas Premium 1kg", price: 120.00, sku: "FD-001" },
@@ -17,7 +28,7 @@ const MOCK_PRODUCTS = [
 
 export function PosPage() {
     const navigate = useNavigate()
-    const [cart, setCart] = useState<any[]>([])
+    const [cart, setCart] = useState<CartItem[]>([])
     const [search, setSearch] = useState("")
 
     // Modals State
@@ -27,7 +38,7 @@ export function PosPage() {
     const [showCut, setShowCut] = useState(false)
 
     // Handlers
-    const addToCart = (product: any) => {
+    const addToCart = (product: Product) => {
         setCart(prev => {
             const existing = prev.find(p => p.id === product.id)
             if (existing) {

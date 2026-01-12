@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabase"
-import { useTenant } from "@/context/TenantContext"
+import { useTenant } from "@/context/useTenant"
 import { format } from "date-fns"
 
 export function useAppointments(currentDate: Date) {
@@ -42,7 +42,7 @@ export function useCreateAppointment() {
     const { tenant } = useTenant()
 
     return useMutation({
-        mutationFn: async (newAppointment: any) => {
+        mutationFn: async (newAppointment: Record<string, unknown>) => {
             if (!tenant?.id) throw new Error("No clinic selected")
 
             const { data, error } = await supabase

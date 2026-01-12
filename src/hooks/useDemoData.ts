@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useQueryClient } from '@tanstack/react-query'
-import { useTenant } from '@/context/TenantContext'
+import { useTenant } from '@/context/useTenant'
 
 export function useDemoData() {
     const [isLoading, setIsLoading] = useState(false)

@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useNavigate } from "react-router-dom"
 import { supabase } from "@/lib/supabase"
-import { useTenant } from "@/context/TenantContext"
+import { useTenant } from "@/context/useTenant"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog"
@@ -16,7 +16,17 @@ interface Clinic {
     id: string;
     name: string;
     status: 'active' | 'trial' | 'past_due' | 'suspended';
-    settings: any;
+    settings: {
+        modules: string[];
+        branding: {
+            primaryColor: string;
+        };
+        layout: {
+            mode: 'sidebar' | 'topbar';
+            radius?: number;
+            navOrder?: string[];
+        };
+    };
     created_at: string;
 }
 
@@ -34,7 +44,7 @@ export function SuperAdminPage() {
     const [isCreating, setIsCreating] = useState(false)
 
     // Forms
-    const [editSettings, setEditSettings] = useState<any>(null)
+    const [editSettings, setEditSettings] = useState<Clinic['settings'] | null>(null)
     const [newClinicData, setNewClinicData] = useState({ name: '', adminEmail: '', adminName: '' })
 
     // 1. Verify Access
@@ -45,20 +55,24 @@ export function SuperAdminPage() {
     }, [isSuperAdmin, isAuthLoading, navigate])
 
     // 2. Fetch Clinics
-    const fetchClinics = async () => {
-        setIsLoading(true)
+    const fetchClinics = useCallback(async () => {
         const { data } = await supabase
             .from('clinics')
             .select('*')
             .order('created_at', { ascending: false })
 
-        if (data) setClinics(data as any[])
+        if (data) setClinics(data as Clinic[])
         setIsLoading(false)
-    }
+    }, [])
 
     useEffect(() => {
-        if (isSuperAdmin) fetchClinics()
-    }, [isSuperAdmin])
+        if (isSuperAdmin) {
+            const timer = setTimeout(() => {
+                void fetchClinics()
+            }, 0)
+            return () => clearTimeout(timer)
+        }
+    }, [isSuperAdmin, fetchClinics])
 
 
     const handleEditClick = (clinic: Clinic) => {
@@ -114,14 +128,15 @@ export function SuperAdminPage() {
 
         alert(`✅ Clínica creada: ${clinic.name}\n\nNota: Para asignar un admin, el usuario debe registrarse y tú debes vincularlo manualmente o usar el sistema de invitación (pendiente).`)
 
-        setClinics([clinic as any, ...clinics])
+        setClinics([clinic as Clinic, ...clinics])
         setIsCreating(false)
         setNewClinicData({ name: '', adminEmail: '', adminName: '' })
     }
 
     // Toggle Module Helper
     const toggleModule = (module: string) => {
-        setEditSettings((prev: any) => {
+        setEditSettings((prev) => {
+            if (!prev) return null
             const modules = prev.modules?.includes(module)
                 ? prev.modules.filter((m: string) => m !== module)
                 : [...(prev.modules || []), module]
@@ -131,13 +146,14 @@ export function SuperAdminPage() {
 
     // Layout Helpers
     const changeRadius = (val: number) => {
-        setEditSettings((prev: any) => ({ ...prev, layout: { ...prev.layout, radius: val } }))
+        setEditSettings((prev) => prev ? ({ ...prev, layout: { ...prev.layout, radius: val } }) : null)
     }
 
     const availableModules = ['appointments', 'patients', 'pos', 'hospital', 'inventory', 'admin']
 
     const moveModule = (index: number, direction: 'up' | 'down') => {
-        setEditSettings((prev: any) => {
+        setEditSettings((prev) => {
+            if (!prev) return null
             const list = [...(prev.layout?.navOrder || availableModules)]
             if (direction === 'up' && index > 0) {
                 [list[index - 1], list[index]] = [list[index], list[index - 1]]
@@ -263,14 +279,14 @@ export function SuperAdminPage() {
                                         <div className="grid grid-cols-2 gap-2">
                                             <div
                                                 className={`border-2 rounded-lg p-3 cursor-pointer flex flex-col items-center gap-2 hover:bg-slate-50 transition-all ${editSettings.layout?.mode === 'sidebar' ? 'border-indigo-600 bg-indigo-50/50' : 'border-slate-200'}`}
-                                                onClick={() => setEditSettings((prev: any) => ({ ...prev, layout: { ...prev.layout, mode: 'sidebar' } }))}
+                                                onClick={() => setEditSettings((prev) => prev ? ({ ...prev, layout: { ...prev.layout, mode: 'sidebar' } }) : null)}
                                             >
                                                 <PanelLeft className={`h-6 w-6 ${editSettings.layout?.mode === 'sidebar' ? 'text-indigo-600' : 'text-slate-400'}`} />
                                                 <span className="text-xs font-medium">Dashboard Clásico</span>
                                             </div>
                                             <div
                                                 className={`border-2 rounded-lg p-3 cursor-pointer flex flex-col items-center gap-2 hover:bg-slate-50 transition-all ${editSettings.layout?.mode === 'topbar' ? 'border-indigo-600 bg-indigo-50/50' : 'border-slate-200'}`}
-                                                onClick={() => setEditSettings((prev: any) => ({ ...prev, layout: { ...prev.layout, mode: 'topbar' } }))}
+                                                onClick={() => setEditSettings((prev) => prev ? ({ ...prev, layout: { ...prev.layout, mode: 'topbar' } }) : null)}
                                             >
                                                 <PanelTop className={`h-6 w-6 ${editSettings.layout?.mode === 'topbar' ? 'text-indigo-600' : 'text-slate-400'}`} />
                                                 <span className="text-xs font-medium">Sitio Moderno</span>

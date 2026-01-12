@@ -21,6 +21,9 @@ const queryClient = new QueryClient({
 // Eager Loading (Critical Path)
 import { LoginPage } from "@/features/auth/LoginPage"
 import { CalendarView } from "@/features/calendar/CalendarView"
+import { SuperAdminPage } from "@/features/admin/SuperAdminPage" // Fixed: Eager load to avoid 404s
+import { TranslatorPage } from "@/features/translator/TranslatorPage" // Fixed: Eager load for reliability
+import { AboutPage } from "@/features/landing/AboutPage" // Fixed: Eager load for landing
 
 // Lazy Loading (Split Bundles)
 // These modules will only be downloaded when the user navigates to them
@@ -32,9 +35,6 @@ const PosPage = lazy(() => import("@/features/ModulesPages").then(module => ({ d
 const InventoryPage = lazy(() => import("@/features/ModulesPages").then(module => ({ default: module.InventoryPage })))
 const HospitalPage = lazy(() => import("@/features/ModulesPages").then(module => ({ default: module.HospitalPage })))
 const AdminPage = lazy(() => import("@/features/ModulesPages").then(module => ({ default: module.AdminPage })))
-const SuperAdminPage = lazy(() => import("@/features/admin/SuperAdminPage").then(module => ({ default: module.SuperAdminPage })))
-const AboutPage = lazy(() => import("@/features/landing/AboutPage").then(module => ({ default: module.AboutPage })))
-const TranslatorPage = lazy(() => import("@/features/translator/TranslatorPage").then(module => ({ default: module.TranslatorPage })))
 
 // Loading Fallback Component
 const PageLoader = () => (
@@ -55,11 +55,11 @@ function App() {
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/about" element={<AboutPage />} />
+                <Route path="/" element={<AboutPage />} />
 
                 {/* <Route element={<ProtectedRoute />}> */}
                 <Route element={<AppShell />}>
-                  <Route path="/" element={<CalendarView />} />
+                  <Route path="/dashboard" element={<CalendarView />} />
                   <Route path="/patients" element={<PatientList />} />
                   <Route path="/patients/:id" element={<PatientProfile />} />
 

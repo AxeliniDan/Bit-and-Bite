@@ -3,7 +3,7 @@
  * @param filename Name of file (without extension)
  * @param rows Array of data objects
  */
-export const exportToCSV = (filename: string, rows: Record<string, any>[]) => {
+export const exportToCSV = (filename: string, rows: Record<string, unknown>[]) => {
     if (!rows || !rows.length) {
         return;
     }
@@ -16,12 +16,12 @@ export const exportToCSV = (filename: string, rows: Record<string, any>[]) => {
         '\n' +
         rows.map(row => {
             return keys.map(k => {
-                let cell = row[k] === null || row[k] === undefined ? '' : row[k];
+                let cell: any = row[k] === null || row[k] === undefined ? '' : row[k];
                 cell = cell instanceof Date
                     ? cell.toLocaleString()
-                    : cell.toString().replace(/"/g, '""');
+                    : String(cell).replace(/"/g, '""');
 
-                if (cell.search(/("|,|\n)/g) >= 0) {
+                if (String(cell).search(/("|,|\n)/g) >= 0) {
                     cell = `"${cell}"`;
                 }
                 return cell;

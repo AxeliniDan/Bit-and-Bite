@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom"
-import { useTenant } from "@/context/TenantContext"
-import { useAuth } from "@/features/auth/AuthContext"
+import { useTenant } from "@/context/useTenant"
+import { useAuth } from "@/features/auth/useAuth"
 import { SidebarShell } from "./SidebarShell"
 import { TopbarShell } from "./TopbarShell"
 import { RightbarShell } from "./RightbarShell"
@@ -23,16 +23,11 @@ export function AppShell() {
         return <SuspendedLockScreen />
     }
 
-    // Layout Engine Router
-    const Layout = () => {
-        if (settings.theme?.layout?.mode === 'topbar') return <TopbarShell />
-        if (settings.theme?.layout?.mode === 'rightbar') return <RightbarShell />
-        return <SidebarShell />
-    }
-
     return (
         <>
-            <Layout />
+            {settings.theme?.layout?.mode === 'topbar' ? <TopbarShell /> :
+                settings.theme?.layout?.mode === 'rightbar' ? <RightbarShell /> :
+                    <SidebarShell />}
             <UpdateNotification />
         </>
     )

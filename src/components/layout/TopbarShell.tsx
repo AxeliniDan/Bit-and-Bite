@@ -1,10 +1,10 @@
-import { useAuth } from "@/features/auth/AuthContext"
+import { useAuth } from "@/features/auth/useAuth"
 import { FeatureGuard } from "@/components/auth/FeatureGuard"
 import { Outlet, Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { CommandPalette } from "@/components/common/CommandPalette"
 import { VoiceMicButton } from "@/features/smart-consult/VoiceMicButton"
-import { useTenant } from "@/context/TenantContext"
+import { useTenant } from "@/context/useTenant"
 
 export function TopbarShell() {
     const { signOut, profile } = useAuth()
@@ -30,7 +30,7 @@ export function TopbarShell() {
                                 const baseClass = "px-3 py-2 text-sm font-medium rounded-full transition-all hover:bg-primary/10 hover:text-primary text-gray-600"
 
                                 if (module === 'appointments') return (
-                                    <Link key="appt" to="/" className={baseClass}>Agenda</Link>
+                                    <Link key="appt" to="/dashboard" className={baseClass}>Agenda</Link>
                                 )
                                 if (module === 'patients') return (
                                     <Link key="patients" to="/patients" className={baseClass}>Pacientes</Link>

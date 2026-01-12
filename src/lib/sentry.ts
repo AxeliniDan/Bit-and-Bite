@@ -11,8 +11,7 @@ export const initSentry = () => {
 
     // I will KEEP the PROD check but warn the user.
     // UPDATED: Removing PROD check temporarily for USER VERIFICATION.
-    // if (import.meta.env.PROD) { 
-    if (true) {
+    if (import.meta.env.PROD) {
         Sentry.init({
             dsn: "https://2d58b09ad400f9ea581a9e1677e97614@o4510649338429440.ingest.us.sentry.io/4510649342164992",
 

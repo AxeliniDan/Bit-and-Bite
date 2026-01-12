@@ -19,7 +19,7 @@ export function PatientProfile() {
     // UI States
     const [isEditing, setIsEditing] = useState(false)
     const [showVaccineModal, setShowVaccineModal] = useState(false)
-    const [editForm, setEditForm] = useState<any>({})
+    const [editForm, setEditForm] = useState<Record<string, unknown>>({})
     const fileInputRef = useRef<HTMLInputElement>(null)
 
     // Vaccine Logic State
@@ -112,10 +112,10 @@ export function PatientProfile() {
                     <div className="flex-1 text-center md:text-left mb-2 w-full">
                         {isEditing ? (
                             <div className="grid gap-2 max-w-md">
-                                <Input value={editForm.name} onChange={e => setEditForm({ ...editForm, name: e.target.value })} className="font-bold text-xl" />
+                                <Input value={(editForm.name as string) || ''} onChange={e => setEditForm({ ...editForm, name: e.target.value })} className="font-bold text-xl" />
                                 <div className="flex gap-2">
-                                    <Input value={editForm.species} onChange={e => setEditForm({ ...editForm, species: e.target.value })} placeholder="Especie" />
-                                    <Input value={editForm.breed} onChange={e => setEditForm({ ...editForm, breed: e.target.value })} placeholder="Raza" />
+                                    <Input value={(editForm.species as string) || ''} onChange={e => setEditForm({ ...editForm, species: e.target.value })} placeholder="Especie" />
+                                    <Input value={(editForm.breed as string) || ''} onChange={e => setEditForm({ ...editForm, breed: e.target.value })} placeholder="Raza" />
                                 </div>
                             </div>
                         ) : (
@@ -129,11 +129,11 @@ export function PatientProfile() {
                     <div className="flex gap-8 text-center md:text-right">
                         <div>
                             <div className="text-xs text-gray-400 uppercase font-bold tracking-wider">Edad</div>
-                            {isEditing ? <Input className="w-20 text-center h-8" value={editForm.age} onChange={e => setEditForm({ ...editForm, age: e.target.value })} /> : <div className="font-semibold text-gray-800">{patient.age}</div>}
+                            {isEditing ? <Input className="w-20 text-center h-8" value={(editForm.age as string) || ''} onChange={e => setEditForm({ ...editForm, age: e.target.value })} /> : <div className="font-semibold text-gray-800">{patient.age}</div>}
                         </div>
                         <div>
                             <div className="text-xs text-gray-400 uppercase font-bold tracking-wider">Peso</div>
-                            {isEditing ? <Input className="w-20 text-center h-8" value={editForm.weight} onChange={e => setEditForm({ ...editForm, weight: e.target.value })} /> : <div className="font-semibold text-gray-800">{patient.weight}</div>}
+                            {isEditing ? <Input className="w-20 text-center h-8" value={(editForm.weight as string) || ''} onChange={e => setEditForm({ ...editForm, weight: e.target.value })} /> : <div className="font-semibold text-gray-800">{patient.weight}</div>}
                         </div>
                     </div>
                 </div>

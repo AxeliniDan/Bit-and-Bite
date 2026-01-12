@@ -5,7 +5,7 @@ export const auditService = {
      * Logs a critical action.
      * Should be called by other services when sensitive data changes.
      */
-    logAction: async (userId: string, action: 'CREATE' | 'UPDATE' | 'DELETE', table: string, recordId: string, diff?: any) => {
+    logAction: async (userId: string, action: 'CREATE' | 'UPDATE' | 'DELETE', table: string, recordId: string, diff?: unknown) => {
         /*
           In a real-world scenario, we might want to fire and forget this 
           so it doesn't block the main thread, or use a DB trigger.

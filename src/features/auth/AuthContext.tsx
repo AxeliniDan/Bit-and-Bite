@@ -1,19 +1,7 @@
-import { createContext, useContext, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { Session, User } from "@supabase/supabase-js"
 import { supabase } from "@/lib/supabase"
-import { Database } from "@/types/database.types"
-
-type Profile = Database['public']['Tables']['profiles']['Row']
-
-interface AuthContextType {
-    session: Session | null
-    user: User | null
-    profile: Profile | null
-    loading: boolean
-    signOut: () => Promise<void>
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined)
+import { AuthContext, Profile } from "./AuthContextType"
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [session, setSession] = useState<Session | null>(null)
@@ -38,7 +26,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setUser(demoUser)
                     setSession({ user: demoUser, access_token: "demo", refresh_token: "demo", expires_in: 3600, token_type: "bearer" } as Session)
                     // Mock Profile
-                    setProfile({ id: "demo-user", first_name: "Demo", last_name: "User", clinic_id: "demo-clinic", role: "admin", is_super_admin: false, created_at: new Date().toISOString() } as any)
+                    setProfile({
+                        id: "demo-user",
+                        full_name: "Demo User",
+                        clinic_id: "demo-clinic",
+                        role: "owner",
+                        avatar_url: null,
+                        created_at: new Date().toISOString()
+                    } as unknown as Profile)
                 }
                 setLoading(false)
             }
@@ -58,7 +53,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     setUser(demoUser)
                     setSession({ user: demoUser, access_token: "demo", refresh_token: "demo", expires_in: 3600, token_type: "bearer" } as Session)
                     // Mock Profile
-                    setProfile({ id: "demo-user", first_name: "Demo", last_name: "User", clinic_id: "demo-clinic", role: "admin", is_super_admin: false, created_at: new Date().toISOString() } as any)
+                    setProfile({
+                        id: "demo-user",
+                        full_name: "Demo User",
+                        clinic_id: "demo-clinic",
+                        role: "owner",
+                        avatar_url: null,
+                        created_at: new Date().toISOString()
+                    } as unknown as Profile)
                 } else {
                     setProfile(null)
                 }
@@ -109,10 +111,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     )
 }
 
-export const useAuth = () => {
-    const context = useContext(AuthContext)
-    if (context === undefined) {
-        throw new Error("useAuth must be used within an AuthProvider")
-    }
-    return context
-}
+

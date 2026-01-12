@@ -1,7 +1,7 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabase"
-import { useTenant } from "@/context/TenantContext"
+import { useTenant } from "@/context/useTenant"
 
 // Types
 export interface VaccineRecord {
@@ -37,7 +37,7 @@ export function useVaccines(patientId: string) {
             if (error) throw error
 
             // Map DB fields to UI friendly names if needed
-            return data.map((item: any) => ({
+            return data.map((item: { id: string, vaccine_name: string, applied_date: string, next_dose_date: string, lot_number: string }) => ({
                 id: item.id,
                 name: item.vaccine_name,
                 applied_date: item.applied_date,

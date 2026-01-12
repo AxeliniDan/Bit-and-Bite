@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Ban, CheckCircle, LogIn } from "lucide-react"
-// import { useTenant } from "@/context/TenantContext"
+// import { useTenant } from "@/context/useTenant"
 // import { useNavigate } from "react-router-dom"
 
 export function TenantList() {
@@ -21,6 +21,7 @@ export function TenantList() {
         if (confirm(`¿Entrar al panel de ${tenantId}?`)) {
             console.log("Switching to", tenantId);
             localStorage.setItem('demo_clinic_id', tenantId);
+            // eslint-disable-next-line
             window.location.hash = "#/"; // Update hash to trigger HashRouter
             window.location.reload(); // Force reload to ensure context updates with new clinicId
         }

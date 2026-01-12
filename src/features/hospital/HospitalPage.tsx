@@ -7,7 +7,17 @@ import { Label } from "@/components/ui/label"
 import { Activity, Pill, FileText, Plus, Thermometer, Clock } from "lucide-react"
 
 // Mock Hospital Layout
-const INITIAL_CAGES = [
+interface Cage {
+    id: number
+    name: string
+    type: string
+    status: 'occupied' | 'available' | 'dirty'
+    patient: string | null
+    diagnosis?: string | null
+    next_med?: string | null
+}
+
+const INITIAL_CAGES: Cage[] = [
     { id: 1, name: "Jaula A1", type: "Grande", status: "occupied", patient: "Firulais", diagnosis: "Parvovirus (Aisla)", next_med: "14:00" },
     { id: 2, name: "Jaula A2", type: "Mediana", status: "available", patient: null },
     { id: 3, name: "Jaula A3", type: "Mediana", status: "occupied", patient: "Gatito", diagnosis: "Post-op Esterilización", next_med: "16:00" },
@@ -16,8 +26,8 @@ const INITIAL_CAGES = [
 ]
 
 export function HospitalPage() {
-    const [cages, setCages] = useState<any[]>(INITIAL_CAGES)
-    const [selectedCage, setSelectedCage] = useState<any>(null)
+    const [cages, setCages] = useState<Cage[]>(INITIAL_CAGES)
+    const [selectedCage, setSelectedCage] = useState<Cage | null>(null)
 
     // Modal States
     const [showAdmit, setShowAdmit] = useState(false)
@@ -38,14 +48,14 @@ export function HospitalPage() {
             id: Date.now(),
             name: `Jaula C${nextNum}`,
             type: "Estándar",
-            status: "available",
+            status: "available" as const,
             patient: null
         }
         setCages([...cages, newCage])
         // Scroll to bottom logic if needed
     }
 
-    const handleAssignClick = (cage: any) => {
+    const handleAssignClick = (cage: Cage) => {
         setSelectedCage(cage)
         setPatientName("")
         setDiagnosis("")
@@ -54,6 +64,7 @@ export function HospitalPage() {
 
     const confirmAdmission = () => {
         if (!patientName || !diagnosis) return alert("Completa los datos")
+        if (!selectedCage) return
         setCages(prev => prev.map(c => c.id === selectedCage.id ? {
             ...c,
             status: 'occupied',
@@ -78,18 +89,19 @@ export function HospitalPage() {
         setCages(prev => prev.map(c => c.id === cageId ? { ...c, status: 'available' } : c))
     }
 
-    const handleOpenVitals = (cage: any) => {
+    const handleOpenVitals = (cage: Cage) => {
         setSelectedCage(cage)
         setVitalsData({ temp: '38.5', hr: '120', rr: '30', weight: '15' }) // Default or fetch
         setShowVitals(true)
     }
 
     const handleSaveVitals = () => {
+        if (!selectedCage) return
         alert(`✅ Signos guardados para ${selectedCage.patient}:\n\nTemp: ${vitalsData.temp}°C\nFC: ${vitalsData.hr} bpm`)
         setShowVitals(false)
     }
 
-    const handleOpenKardex = (cage: any) => {
+    const handleOpenKardex = (cage: Cage) => {
         setSelectedCage(cage)
         setKardexNote("")
         setShowKardex(true)

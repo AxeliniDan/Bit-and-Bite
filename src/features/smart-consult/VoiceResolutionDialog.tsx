@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { AIConsultResult } from "./aiConsultService"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -17,17 +17,10 @@ interface VoiceResolutionDialogProps {
 export function VoiceResolutionDialog({ open, onOpenChange, result, isLoading }: VoiceResolutionDialogProps) {
     const [step, setStep] = useState<'MATCHING' | 'FORM'>('MATCHING')
 
-    // Reset step when dialog opens
-    useEffect(() => {
-        if (open && result) {
-            setStep('MATCHING')
-        }
-    }, [open, result])
-
     if (isLoading) {
         return (
             <Dialog open={open} onOpenChange={onOpenChange}>
-                <DialogContent className="sm:max-w-[425px] flex flex-col items-center justify-center py-12">
+                <DialogContent key="loading" className="sm:max-w-[425px] flex flex-col items-center justify-center py-12">
                     <div className="relative">
                         <div className="absolute inset-0 bg-blue-500 rounded-full opacity-20 animate-ping"></div>
                         <Loader2 className="h-12 w-12 text-blue-600 animate-spin relative z-10" />
@@ -45,7 +38,7 @@ export function VoiceResolutionDialog({ open, onOpenChange, result, isLoading }:
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+            <DialogContent key={open ? 'open' : 'closed'} className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Stethoscope className="h-5 w-5 text-blue-600" />

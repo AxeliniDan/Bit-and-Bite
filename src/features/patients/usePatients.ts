@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { supabase } from "@/lib/supabase"
-import { useTenant } from "@/context/TenantContext"
+import { useTenant } from "@/context/useTenant"
 
 export function usePatients() {
     const { tenant } = useTenant()
@@ -42,7 +42,7 @@ export function useUpdatePatient() {
     const queryClient = useQueryClient()
 
     return useMutation({
-        mutationFn: async (data: any) => {
+        mutationFn: async (data: { id: string;[key: string]: unknown }) => {
             const { data: updated, error } = await supabase
                 .from('patients')
                 .update(data)
@@ -65,7 +65,7 @@ export function useCreatePatient() {
     const { tenant } = useTenant()
 
     return useMutation({
-        mutationFn: async (data: any) => {
+        mutationFn: async (data: Record<string, unknown>) => {
             if (!tenant?.id) throw new Error("No clinic selected")
 
             const { data: newPatient, error } = await supabase

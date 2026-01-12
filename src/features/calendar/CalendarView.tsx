@@ -13,10 +13,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
+interface Appointment {
+    id: string
+    start_time: string
+    patients?: { name: string }
+    clients?: { full_name: string }
+    [key: string]: unknown
+}
+
 export function CalendarView() {
     const [currentDate, setCurrentDate] = useState(new Date())
     const [selectedSlot, setSelectedSlot] = useState<{ date: Date, hour: number } | null>(null)
-    const [selectedAppointment, setSelectedAppointment] = useState<any>(null)
+    const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null)
     const [showNewAppt, setShowNewAppt] = useState(false)
 
     // Quick Form State
@@ -44,7 +52,7 @@ export function CalendarView() {
         setShowNewAppt(true)
     }
 
-    const handleAppointmentClick = (e: React.MouseEvent, apt: any) => {
+    const handleAppointmentClick = (e: React.MouseEvent, apt: Appointment) => {
         e.stopPropagation()
         setSelectedAppointment(apt)
     }

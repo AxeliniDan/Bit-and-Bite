@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { useTenant } from '@/context/TenantContext';
+import { useTenant } from '@/context/useTenant';
 import { Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 

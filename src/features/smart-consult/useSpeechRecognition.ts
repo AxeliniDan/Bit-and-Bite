@@ -8,10 +8,19 @@ export function useSpeechRecognition() {
     const [interimTranscript, setInterimTranscript] = useState("")
 
     // Use useRef to persist the recognition instance
-    const recognitionRef = useRef<any>(null)
+    const recognitionRef = useRef<null | {
+        lang: string;
+        continuous: boolean;
+        interimResults: boolean;
+        onresult: (event: { resultIndex: number; results: { length: number;[key: number]: { isFinal: boolean;[key: number]: { transcript: string } } } }) => void;
+        onerror: (event: { error: string }) => void;
+        start: () => void;
+        stop: () => void;
+    }>(null)
 
     useEffect(() => {
         // Initialize SpeechRecognition
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition
         if (SpeechRecognition) {
             const recognition = new SpeechRecognition()
@@ -19,15 +28,16 @@ export function useSpeechRecognition() {
             recognition.interimResults = true
             recognition.lang = 'es-ES' // Default
 
-            recognition.onresult = (event: any) => {
+            recognition.onresult = (event: { resultIndex: number; results: SpeechRecognitionResultList }) => {
                 let finalTranscript = ''
                 let currentInterim = ''
 
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
-                    if (event.results[i].isFinal) {
-                        finalTranscript += event.results[i][0].transcript
+                    const result = event.results[i];
+                    if (result.isFinal) {
+                        finalTranscript += result[0].transcript
                     } else {
-                        currentInterim += event.results[i][0].transcript
+                        currentInterim += result[0].transcript
                     }
                 }
 
@@ -37,7 +47,7 @@ export function useSpeechRecognition() {
                 setInterimTranscript(currentInterim)
             }
 
-            recognition.onerror = (event: any) => {
+            recognition.onerror = (event: { error: string }) => {
                 console.error("Speech recognition error", event.error)
                 setError(event.error)
                 setIsRecording(false)
@@ -45,6 +55,7 @@ export function useSpeechRecognition() {
 
             recognitionRef.current = recognition
         } else {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
             setError("Browser not supported")
         }
     }, [])

@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useCreateAppointment } from "./useAppointments"
 
-import { useAuth } from "@/features/auth/AuthContext"
+import { useAuth } from "@/features/auth/useAuth"
 
 interface NewAppointmentDialogProps {
     children?: React.ReactNode

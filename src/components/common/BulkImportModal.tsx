@@ -7,13 +7,13 @@ import { Upload, FileUp, AlertTriangle, CheckCircle2 } from "lucide-react"
 interface BulkImportModalProps {
     isOpen: boolean
     onClose: () => void
-    onImport: (data: any[]) => Promise<void>
+    onImport: (data: Record<string, unknown>[]) => Promise<void>
     title?: string
 }
 
 export function BulkImportModal({ isOpen, onClose, onImport, title = "Carga Masiva" }: BulkImportModalProps) {
     const [file, setFile] = useState<File | null>(null)
-    const [previewData, setPreviewData] = useState<any[]>([])
+    const [previewData, setPreviewData] = useState<Record<string, unknown>[]>([])
     const [headers, setHeaders] = useState<string[]>([])
     const [isLoading, setIsLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
@@ -46,7 +46,7 @@ export function BulkImportModal({ isOpen, onClose, onImport, title = "Carga Masi
 
                 const data = lines.slice(1, 6).map(line => { // Preview top 5
                     const values = line.split(',')
-                    const row: any = {}
+                    const row: Record<string, unknown> = {}
                     headers.forEach((header, index) => {
                         row[header] = values[index]?.trim().replace(/"/g, '') || ''
                     })
@@ -54,7 +54,7 @@ export function BulkImportModal({ isOpen, onClose, onImport, title = "Carga Masi
                 })
 
                 setPreviewData(data)
-            } catch (err) {
+            } catch {
                 setError("Error al leer el archivo. Verifica el formato.")
             }
         }
@@ -67,7 +67,7 @@ export function BulkImportModal({ isOpen, onClose, onImport, title = "Carga Masi
             // In a real scenario we would parse the full file here
             await onImport(previewData)
             onClose()
-        } catch (e) {
+        } catch {
             setError("Falló la importación. Intenta de nuevo.")
         } finally {
             setIsLoading(false)
@@ -131,7 +131,7 @@ export function BulkImportModal({ isOpen, onClose, onImport, title = "Carga Masi
                                             <tbody className="[&_tr:last-child]:border-0">
                                                 {previewData.map((row, i) => (
                                                     <tr key={i} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                                                        {headers.slice(0, 3).map(h => <td key={h} className="p-4 align-middle [&:has([role=checkbox])]:pr-0">{row[h]}</td>)}
+                                                        {headers.slice(0, 3).map(h => <td key={h} className="p-4 align-middle [&:has([role=checkbox])]:pr-0">{(row[h] as string)}</td>)}
                                                     </tr>
                                                 ))}
                                             </tbody>

@@ -53,7 +53,7 @@ export const hospitalService = {
     /**
      * Add an entry to the Flow Sheet (Kardex)
      */
-    addKardexEntry: async (admissionId: string, userId: string, type: 'medication' | 'vital_sign', payload: any) => {
+    addKardexEntry: async (admissionId: string, userId: string, type: 'medication' | 'vital_sign', payload: Record<string, unknown>) => {
         const { error } = await supabase
             .from('medical_events')
             .insert({

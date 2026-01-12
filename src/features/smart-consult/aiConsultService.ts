@@ -16,7 +16,6 @@ export interface AIConsultResult {
 }
 
 // --- SYSTEM PROMPTS ---
-// @ts-ignore
 const SYSTEM_PROMPT_GEMINI = `Actúa como un Motor de Procesamiento de Datos Clínicos Veterinarios experto.
 Recibirás una transcripción de texto.
 Tu salida debe ser un JSON VÁLIDO unicamente.
@@ -73,7 +72,7 @@ export async function processVoiceConsultation(input: Blob | string): Promise<AI
     try {
         console.log("Calling Gemini Flash Latest (Stable)...")
 
-        // Updated to 'gemini-flash-latest' which is the standard alias and usually has free quota
+        // Updated to 'gemini-1.5-flash' which is the current stable version
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -104,9 +103,10 @@ export async function processVoiceConsultation(input: Blob | string): Promise<AI
         } else {
             throw new Error("La IA no devolvió ningún texto JSON.")
         }
-    } catch (e: any) {
+    } catch (e: unknown) {
         console.error("Gemini Critical Error:", e)
-        alert("CRITICAL AI ERROR:\n" + e.message)
+        const msg = e instanceof Error ? e.message : "Unknown AI error"
+        alert("CRITICAL AI ERROR:\n" + msg)
         throw e
     }
 }

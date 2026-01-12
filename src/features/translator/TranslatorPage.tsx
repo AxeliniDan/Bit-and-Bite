@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useSpeechRecognition } from "@/features/smart-consult/useSpeechRecognition"
-import { Mic, MicOff, Languages, Volume2, ArrowRightLeft } from "lucide-react"
+import { Mic, MicOff, Languages, Volume2, ArrowRightLeft, ShieldAlert } from "lucide-react"
 
 // --- Quick Phrases Data ---
 const QUICK_PHRASES = [
@@ -48,9 +48,10 @@ async function translateText(text: string, targetLang: 'es' | 'en'): Promise<str
 
         const data = await response.json()
         return data.candidates?.[0]?.content?.parts?.[0]?.text || "Error: No translation found."
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error("Translation Request Failed:", error)
-        return `Error: ${error.message || "Unknown error"}`
+        const msg = error instanceof Error ? error.message : "Unknown error"
+        return `Error: ${msg}`
     }
 }
 
@@ -61,14 +62,7 @@ export function TranslatorPage() {
     const [isTranslating, setIsTranslating] = useState(false)
     const [history, setHistory] = useState<{ original: string, translated: string, direction: string }[]>([])
 
-    // Trigger translation when recording stops and we have a transcript
-    useEffect(() => {
-        if (!isRecording && transcript.trim().length > 0) {
-            handleTranslation(transcript)
-        }
-    }, [isRecording, transcript])
-
-    const handleTranslation = async (text: string) => {
+    const handleTranslation = useCallback(async (text: string) => {
         setIsTranslating(true)
         try {
             const targetLang = mode === 'es-to-en' ? 'en' : 'es'
@@ -80,13 +74,21 @@ export function TranslatorPage() {
 
             // Auto-speak result
             speak(result, targetLang)
-        } catch (e) {
+        } catch (e: unknown) {
             console.error(e)
-            alert("Translation Error")
+            const msg = e instanceof Error ? e.message : "Translation Error"
+            alert(msg)
         } finally {
             setIsTranslating(false)
         }
-    }
+    }, [mode])
+
+    // Trigger translation when recording stops and we have a transcript
+    useEffect(() => {
+        if (!isRecording && transcript.trim().length > 0) {
+            handleTranslation(transcript)
+        }
+    }, [isRecording, transcript, handleTranslation])
 
     const speak = (text: string, lang: 'es' | 'en') => {
         const utterance = new SpeechSynthesisUtterance(text)
@@ -116,8 +118,21 @@ export function TranslatorPage() {
         speak(targetText, targetLang)
     }
 
+    // Check for API Key
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+
     return (
         <div className="h-[calc(100vh-4rem)] flex flex-col gap-4 p-4 max-w-4xl mx-auto">
+            {!apiKey && (
+                <div className="bg-destructive/15 text-destructive border border-destructive/20 p-4 rounded-md flex items-center gap-2">
+                    <ShieldAlert className="h-5 w-5" />
+                    <div>
+                        <p className="font-bold">Missing API Key</p>
+                        <p className="text-sm">Please config VITE_GEMINI_API_KEY in your environment variables or GitHub Secrets.</p>
+                    </div>
+                </div>
+            )}
+
             <header className="flex items-center justify-between mb-4">
                 <h1 className="text-2xl font-bold flex items-center gap-2">
                     <Languages className="text-primary" />
@@ -138,7 +153,7 @@ export function TranslatorPage() {
                     <div className="flex-1 flex items-center justify-center w-full relative">
                         {(!isRecording && !transcript) && (
                             <p className="text-2xl font-medium text-foreground/40 absolute">
-                                Presione el micrófono
+                                {apiKey ? "Presione el micrófono" : "API Key Required"}
                             </p>
                         )}
                         <p className="text-2xl font-medium text-foreground/80 break-words w-full px-4">
@@ -151,6 +166,7 @@ export function TranslatorPage() {
                         size="icon"
                         className={`h-20 w-20 rounded-full shadow-xl transition-all ${isRecording ? 'bg-red-500 hover:bg-red-600 scale-110' : 'bg-primary hover:bg-primary/90'}`}
                         onClick={isRecording ? stopRecording : () => startRecording(mode === 'es-to-en' ? 'es-ES' : 'en-US')}
+                        disabled={!apiKey}
                     >
                         {isRecording ? <MicOff className="h-8 w-8" /> : <Mic className="h-8 w-8" />}
                     </Button>
