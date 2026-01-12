@@ -1,4 +1,3 @@
-// Fix lint errors in TranslatorPage.tsx: dependency array and implicit any
 import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
