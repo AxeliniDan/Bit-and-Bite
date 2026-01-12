@@ -40,7 +40,7 @@ export function SidebarShell() {
     const navOrder = theme.layout?.navOrder || [];
     const menuItems = navOrder.map((module: string) => {
         switch (module) {
-            case 'appointments': return { title: "Agenda", href: "/", icon: LayoutDashboard }
+            case 'appointments': return { title: "Agenda", href: "/dashboard", icon: LayoutDashboard }
             case 'patients': return { title: "Pacientes", href: "/patients", icon: Users }
             case 'hospital': return { title: "Hospital", href: "/hospital", icon: Stethoscope }
             case 'pos': return { title: "Caja (POS)", href: "/pos", icon: ShoppingCart }

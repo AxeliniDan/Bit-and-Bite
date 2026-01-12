@@ -30,7 +30,7 @@ export function TopbarShell() {
                                 const baseClass = "px-3 py-2 text-sm font-medium rounded-full transition-all hover:bg-primary/10 hover:text-primary text-gray-600"
 
                                 if (module === 'appointments') return (
-                                    <Link key="appt" to="/" className={baseClass}>Agenda</Link>
+                                    <Link key="appt" to="/dashboard" className={baseClass}>Agenda</Link>
                                 )
                                 if (module === 'patients') return (
                                     <Link key="patients" to="/patients" className={baseClass}>Pacientes</Link>

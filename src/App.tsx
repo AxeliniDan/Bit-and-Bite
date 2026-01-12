@@ -55,11 +55,11 @@ function App() {
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
-                <Route path="/about" element={<AboutPage />} />
+                <Route path="/" element={<AboutPage />} />
 
                 {/* <Route element={<ProtectedRoute />}> */}
                 <Route element={<AppShell />}>
-                  <Route path="/" element={<CalendarView />} />
+                  <Route path="/dashboard" element={<CalendarView />} />
                   <Route path="/patients" element={<PatientList />} />
                   <Route path="/patients/:id" element={<PatientProfile />} />
 

@@ -25,7 +25,7 @@ export function LoginPage() {
                 password
             })
             if (signInError) throw signInError
-            navigate("/")
+            navigate("/dashboard")
         } catch (err: any) {
             setError(err.message || "Error al iniciar sesión")
         } finally {
