@@ -1,3 +1,4 @@
+// Fix syntax error in TenantContext
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from "@/lib/supabase"
 import { useAuth } from "@/features/auth/AuthContext"
