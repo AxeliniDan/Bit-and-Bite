@@ -79,19 +79,17 @@ export function TenantProvider({ children }: { children: ReactNode }) {
             if (authLoading) return // Wait for Auth to finish
 
             if (!user) {
-                // No user logged in
+                // No user logged in? We DON'T return early anymore, we let it fall through to finally block for demo check
                 setClinicId("")
                 setIsSuperAdmin(false)
-                setIsLoading(false)
-                return
-            }
-
-            setIsLoading(true)
-            try {
-                // Fetch User Profile AND Clinic Settings
-                const { data: profile, error: profileError } = await supabase
-                    .from('profiles')
-                    .select(`
+                // continue to finally...
+            } else {
+                // Only fetch profile if user exists
+                try {
+                    // Fetch User Profile AND Clinic Settings
+                    const { data: profile, error: profileError } = await supabase
+                        .from('profiles')
+                        .select(`
                         clinic_id, 
                         role, 
                         is_super_admin,
@@ -99,50 +97,72 @@ export function TenantProvider({ children }: { children: ReactNode }) {
                             settings
                         )
                     `)
-                    .eq('id', user.id)
-                    .single()
+                        .eq('id', user.id)
+                        .single()
 
-                if (profileError) throw profileError
+                    if (profileError) throw profileError
 
-                if (profile) {
-                    if (profile.clinic_id) setClinicId(profile.clinic_id)
-                    if (profile.is_super_admin) setIsSuperAdmin(true)
+                    if (profile) {
+                        if (profile.clinic_id) setClinicId(profile.clinic_id)
+                        if (profile.is_super_admin) setIsSuperAdmin(true)
 
-                    // LOAD SETTINGS FROM DB
-                    // @ts-ignore
-                    if (profile.clinics?.settings) {
+                        // LOAD SETTINGS FROM DB
                         // @ts-ignore
-                        setSettings(profile.clinics.settings as ClinicSettings)
-                    }
-                }
-
-            } catch (error) {
-                console.error("Failed to load tenant", error)
-            } finally {
-                // DEMO MODE CHECK
-                if (window.location.hostname.includes("axelinidan.github.io") || window.location.hash.includes("demo_mode=true")) {
-                    if (!clinicId) {
-                        setClinicId("demo-clinic")
-                        // Enforce Demo Settings with Translator
-                        setSettings({
-                            modules: ['appointments', 'patients', 'pos', 'hospital', 'inventory', 'translator', 'admin'],
-                            theme: {
-                                tokens: DEFAULT_SETTINGS.theme!.tokens,
-                                layout: {
-                                    mode: 'sidebar',
-                                    density: 'normal',
-                                    navOrder: ['appointments', 'patients', 'hospital', 'pos', 'translator', 'inventory', 'admin']
-                                },
-                                branding: { logoUrl: null }
+                        if (profile.clinics?.settings) {
+                            // @ts-ignore
+                            const dbSettings = profile.clinics.settings as ClinicSettings
+                            
+                            // MIGRATION: Ensure 'translator' exists for old accounts
+                            if (!dbSettings.modules.includes('translator')) {
+                                dbSettings.modules.push('translator')
                             }
-                        })
+                            if (dbSettings.theme?.layout?.navOrder && !dbSettings.theme.layout.navOrder.includes('translator')) {
+                                // Add before 'admin' or at the end
+                                const adminIdx = dbSettings.theme.layout.navOrder.indexOf('admin')
+                                if (adminIdx >= 0) {
+                                    dbSettings.theme.layout.navOrder.splice(adminIdx, 0, 'translator')
+                                } else {
+                                    dbSettings.theme.layout.navOrder.push('translator')
+                                }
+                            }
+
+                            setSettings(dbSettings)
+                        }
                     }
+
+                } catch (error) {
+                    console.error("Failed to load tenant", error)
                 }
-                setIsLoading(false)
             }
+
+            // finally block handles checking for demo mode...
+            setIsLoading(false) // Set loading false after check logic
         }
 
-        loadTenant()
+        // Wrap execution to use finally behavior simulation since we refactored try/catch
+        const run = async () => {
+            await loadTenant();
+             // DEMO MODE CHECK (Moved here to ensure it runs always)
+             if (window.location.hostname.includes("axelinidan.github.io") || window.location.hash.includes("demo_mode=true")) {
+                if (!user) { // Only force demo if NOT logged in (to allow login on demo site)
+                    console.log("Activating Demo Mode Settings")
+                    setClinicId("demo-clinic")
+                    setSettings({
+                        modules: ['appointments', 'patients', 'pos', 'hospital', 'inventory', 'translator', 'admin'],
+                        theme: {
+                            tokens: DEFAULT_SETTINGS.theme!.tokens,
+                            layout: {
+                                mode: 'sidebar',
+                                density: 'normal',
+                                navOrder: ['appointments', 'patients', 'hospital', 'pos', 'translator', 'inventory', 'admin']
+                            },
+                            branding: { logoUrl: null }
+                        }
+                    })
+                }
+            }
+        }
+        run()
     }, [user, authLoading])
 
     const hasModule = (moduleName: string) => {
