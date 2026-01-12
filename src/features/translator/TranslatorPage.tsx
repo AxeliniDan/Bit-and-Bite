@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react"
+// Fix lint errors in TranslatorPage.tsx: dependency array and implicit any
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useSpeechRecognition } from "@/features/smart-consult/useSpeechRecognition"
@@ -61,14 +62,7 @@ export function TranslatorPage() {
     const [isTranslating, setIsTranslating] = useState(false)
     const [history, setHistory] = useState<{ original: string, translated: string, direction: string }[]>([])
 
-    // Trigger translation when recording stops and we have a transcript
-    useEffect(() => {
-        if (!isRecording && transcript.trim().length > 0) {
-            handleTranslation(transcript)
-        }
-    }, [isRecording, transcript])
-
-    const handleTranslation = async (text: string) => {
+    const handleTranslation = useCallback(async (text: string) => {
         setIsTranslating(true)
         try {
             const targetLang = mode === 'es-to-en' ? 'en' : 'es'
@@ -86,7 +80,14 @@ export function TranslatorPage() {
         } finally {
             setIsTranslating(false)
         }
-    }
+    }, [mode])
+
+    // Trigger translation when recording stops and we have a transcript
+    useEffect(() => {
+        if (!isRecording && transcript.trim().length > 0) {
+            handleTranslation(transcript)
+        }
+    }, [isRecording, transcript, handleTranslation])
 
     const speak = (text: string, lang: 'es' | 'en') => {
         const utterance = new SpeechSynthesisUtterance(text)

@@ -45,6 +45,7 @@ export function useSpeechRecognition() {
 
             recognitionRef.current = recognition
         } else {
+             // eslint-disable-next-line react-hooks/set-state-in-effect
             setError("Browser not supported")
         }
     }, [])
