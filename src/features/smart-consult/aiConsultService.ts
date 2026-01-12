@@ -73,8 +73,8 @@ export async function processVoiceConsultation(input: Blob | string): Promise<AI
     try {
         console.log("Calling Gemini Flash Latest (Stable)...")
 
-        // Updated to 'gemini-flash-latest' which is the standard alias and usually has free quota
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`, {
+        // Updated to 'gemini-1.5-flash' which is the current stable version
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
